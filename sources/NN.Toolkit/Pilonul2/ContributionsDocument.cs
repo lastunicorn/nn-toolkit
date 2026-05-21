@@ -1,10 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Tabula;
-using Tabula.Detectors;
-using Tabula.Extractors;
-using UglyToad.PdfPig;
 
 namespace DustInTheWind.NN.Toolkit.Pilonul2;
 
@@ -18,67 +14,29 @@ public class ContributionsDocument : Collection<Contribution>
     {
         ContributionsDocument document = [];
 
-        ParsingOptions options = new()
-        {
-            ClipPaths = true
-        };
+        P2PdfDocument pdfDocument = new(filePath);
+        IEnumerable<PdfTableRow> rows = pdfDocument.EnumerateRows();
 
-        using PdfDocument pdfDocument = PdfDocument.Open(filePath, options);
-
-        SimpleNurminenDetectionAlgorithm detector = new();
-        IExtractionAlgorithm algorithm = new BasicExtractionAlgorithm();
         bool hasCapturedHeader = false;
 
-        for (int pageIndex = 1; pageIndex <= pdfDocument.NumberOfPages; pageIndex++)
+        foreach (PdfTableRow row in rows)
         {
-            PageArea page = ObjectExtractor.Extract(pdfDocument, pageIndex);
-            IReadOnlyList<TableRectangle> regions = detector.Detect(page);
-
-            IReadOnlyList<Table> tables = ExtractTables(page, regions, algorithm);
-
-            foreach (Table table in tables)
+            if (!hasCapturedHeader)
             {
-                List<PdfTableRow> rows = table.Rows
-                    .Select(x => new PdfTableRow(x))
-                    .ToList();
+                IEnumerable<string> columnNames = row
+                    .Select(x => Pattern.Replace(x, " "));
 
-                if (rows.Count == 0)
-                    continue;
-
-                int startIndex = 0;
-
-                if (!hasCapturedHeader)
-                {
-                    IEnumerable<string> columnNames = rows[0]
-                        .Select(x => Pattern.Replace(x, " "));
-
-                    document.ColumnNames.AddRange(columnNames);
-                    hasCapturedHeader = true;
-                    startIndex = 1;
-                }
-
-                foreach (PdfTableRow row in rows.Skip(startIndex))
-                {
-                    if (TryCreateContribution(row, out Contribution contribution))
-                        document.Add(contribution);
-                }
+                document.ColumnNames.AddRange(columnNames);
+                hasCapturedHeader = true;
+            }
+            else
+            {
+                if (TryCreateContribution(row, out Contribution contribution))
+                    document.Add(contribution);
             }
         }
 
         return document;
-    }
-
-    private static IReadOnlyList<Table> ExtractTables(PageArea page, IReadOnlyList<TableRectangle> regions, IExtractionAlgorithm algorithm)
-    {
-        if (regions.Count == 0)
-            return algorithm.Extract(page);
-
-        List<Table> tables = [];
-
-        foreach (TableRectangle region in regions)
-            tables.AddRange(algorithm.Extract(page.GetArea(region.BoundingBox)));
-
-        return tables;
     }
 
     private static bool TryCreateContribution(PdfTableRow row, out Contribution contribution)
