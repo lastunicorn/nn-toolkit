@@ -31,7 +31,7 @@ internal class Program
                 contribution.PaidInMonth);
 
             string date = $"{contribution.PaidInMonth.Year:00}-{contribution.PaidInMonth.Month:00}-01";
-            string note = string.Join("; ", document.ColumnNames.Zip(contribution.ToStringArray(), (h, v) => $"{h}={v}"));
+            string note = string.Join("; ", document.Header.Zip(contribution.ToStringArray(), (h, v) => $"{h}={v}"));
 
             output.WriteLine($"NN,NN,{date},08:05,{contribution.GrossValue},{contribution.UnitCount},Buy,{contribution.AdministrationFee},\"{note}\"");
             cashOutput.WriteLine($"Deposit,NN,{date},08:00,{contribution.GrossValue},\"Luna: {contribution.Month}\"");

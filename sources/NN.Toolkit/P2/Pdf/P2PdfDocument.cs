@@ -3,7 +3,7 @@ using Tabula.Detectors;
 using Tabula.Extractors;
 using UglyToad.PdfPig;
 
-namespace DustInTheWind.NN.Toolkit.P2;
+namespace DustInTheWind.NN.Toolkit.P2.Pdf;
 
 internal class P2PdfDocument
 {

@@ -1,7 +1,7 @@
 using System.Collections;
 using Tabula;
 
-namespace DustInTheWind.NN.Toolkit.P2;
+namespace DustInTheWind.NN.Toolkit.P2.Pdf;
 
 internal class P2PdfTableRow : IEnumerable<string>
 {

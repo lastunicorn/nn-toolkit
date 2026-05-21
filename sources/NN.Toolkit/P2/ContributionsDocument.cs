@@ -1,14 +1,11 @@
 ﻿using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Text.RegularExpressions;
+using DustInTheWind.NN.Toolkit.P2.Pdf;
 
 namespace DustInTheWind.NN.Toolkit.P2;
 
 public class ContributionsDocument : Collection<Contribution>
 {
-    private static readonly Regex Pattern = new(@"\s+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    public List<string> ColumnNames { get; } = [];
+    public ContributionsHeader Header { get; } = [];
 
     public static ContributionsDocument LoadFromFile(string filePath)
     {
@@ -17,73 +14,27 @@ public class ContributionsDocument : Collection<Contribution>
         P2PdfDocument pdfDocument = new(filePath);
         IEnumerable<P2PdfTableRow> rows = pdfDocument.EnumerateRows();
 
-        bool hasCapturedHeader = false;
+        using IEnumerator<P2PdfTableRow> rowEnumerator = rows.GetEnumerator();
 
-        foreach (P2PdfTableRow row in rows)
+        if (rowEnumerator.MoveNext())
+            document.Header.AddRange(rowEnumerator.Current);
+
+        while (rowEnumerator.MoveNext())
         {
-            if (!hasCapturedHeader)
-            {
-                IEnumerable<string> columnNames = row
-                    .Select(x => Pattern.Replace(x, " "));
+            P2PdfTableRow row = rowEnumerator.Current;
 
-                document.ColumnNames.AddRange(columnNames);
-                hasCapturedHeader = true;
-            }
-            else
+            document.Add(new Contribution
             {
-                if (TryCreateContribution(row, out Contribution contribution))
-                    document.Add(contribution);
-            }
+                Month = row.GetMonthDate(0),
+                GrossValue = row.GetDecimal(1),
+                AdministrationFee = row.GetDecimal(2),
+                NetValue = row.GetDecimal(3),
+                UnitValue = row.GetDecimal(4),
+                UnitCount = row.GetDecimal(5),
+                PaidInMonth = row.GetMonthDate(6)
+            });
         }
 
         return document;
-    }
-
-    private static bool TryCreateContribution(P2PdfTableRow row, out Contribution contribution)
-    {
-        contribution = null!;
-
-        if (!TryParseMonthDate(row[0], out MonthDate month) ||
-            !TryParseDecimal(row[1], out decimal grossValue) ||
-            !TryParseDecimal(row[2], out decimal administrationFee) ||
-            !TryParseDecimal(row[3], out decimal netValue) ||
-            !TryParseDecimal(row[4], out decimal unitValue) ||
-            !TryParseDecimal(row[5], out decimal unitCount) ||
-            !TryParseMonthDate(row[6], out MonthDate paidInMonth))
-        {
-            return false;
-        }
-
-        contribution = new Contribution
-        {
-            Month = month,
-            GrossValue = grossValue,
-            AdministrationFee = administrationFee,
-            NetValue = netValue,
-            UnitValue = unitValue,
-            UnitCount = unitCount,
-            PaidInMonth = paidInMonth
-        };
-
-        return true;
-    }
-
-    private static bool TryParseMonthDate(string value, out MonthDate monthDate)
-    {
-        try
-        {
-            monthDate = MonthDate.Parse(value.Trim());
-            return true;
-        }
-        catch
-        {
-            monthDate = default;
-            return false;
-        }
-    }
-
-    private static bool TryParseDecimal(string value, out decimal decimalValue)
-    {
-        return decimal.TryParse(value.Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out decimalValue);
     }
 }
