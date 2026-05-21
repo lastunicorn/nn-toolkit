@@ -31,33 +31,31 @@ internal class P2PdfDocument
             PageArea page = ObjectExtractor.Extract(pdfDocument, pageIndex);
             IReadOnlyList<TableRectangle> regions = detector.Detect(page);
 
-            IReadOnlyList<Table> tables = ExtractTables(page, regions, algorithm);
+            IEnumerable<P2PdfTable> tables = ExtractTables(page, regions, algorithm);
 
-            foreach (Table table in tables)
+            foreach (P2PdfTable table in tables)
             {
-                List<P2PdfTableRow> rows = table.Rows
-                    .Select(x => new P2PdfTableRow(x))
-                    .ToList();
-
-                if (rows.Count == 0)
-                    continue;
+                IEnumerable<P2PdfTableRow> rows = table.EnumerateRows();
 
                 foreach (P2PdfTableRow row in rows)
-                   yield return row;
+                    yield return row;
             }
         }
     }
 
-    private static IReadOnlyList<Table> ExtractTables(PageArea page, IReadOnlyList<TableRectangle> regions, IExtractionAlgorithm algorithm)
+    private static IEnumerable<P2PdfTable> ExtractTables(PageArea page, IReadOnlyList<TableRectangle> regions, IExtractionAlgorithm algorithm)
     {
         if (regions.Count == 0)
-            return algorithm.Extract(page);
-
-        List<Table> tables = [];
+            yield break;
 
         foreach (TableRectangle region in regions)
-            tables.AddRange(algorithm.Extract(page.GetArea(region.BoundingBox)));
+        {
+            PageArea pageArea = page.GetArea(region.BoundingBox);
+            IEnumerable<P2PdfTable> p2PdfTables = algorithm.Extract(pageArea)
+                .Select(x => new P2PdfTable(x));
 
-        return tables;
+            foreach (P2PdfTable p2PdfTable in p2PdfTables)
+                yield return p2PdfTable;
+        }
     }
 }
