@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace DustInTheWind.NN.Toolkit.Pilonul2;
+namespace DustInTheWind.NN.Toolkit.P2;
 
 public class ContributionsDocument : Collection<Contribution>
 {
@@ -15,11 +15,11 @@ public class ContributionsDocument : Collection<Contribution>
         ContributionsDocument document = [];
 
         P2PdfDocument pdfDocument = new(filePath);
-        IEnumerable<PdfTableRow> rows = pdfDocument.EnumerateRows();
+        IEnumerable<P2PdfTableRow> rows = pdfDocument.EnumerateRows();
 
         bool hasCapturedHeader = false;
 
-        foreach (PdfTableRow row in rows)
+        foreach (P2PdfTableRow row in rows)
         {
             if (!hasCapturedHeader)
             {
@@ -39,7 +39,7 @@ public class ContributionsDocument : Collection<Contribution>
         return document;
     }
 
-    private static bool TryCreateContribution(PdfTableRow row, out Contribution contribution)
+    private static bool TryCreateContribution(P2PdfTableRow row, out Contribution contribution)
     {
         contribution = null!;
 

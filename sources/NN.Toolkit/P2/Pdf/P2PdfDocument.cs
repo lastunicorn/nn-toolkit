@@ -3,7 +3,7 @@ using Tabula.Detectors;
 using Tabula.Extractors;
 using UglyToad.PdfPig;
 
-namespace DustInTheWind.NN.Toolkit.Pilonul2;
+namespace DustInTheWind.NN.Toolkit.P2;
 
 internal class P2PdfDocument
 {
@@ -14,7 +14,7 @@ internal class P2PdfDocument
         this.filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
     }
 
-    public IEnumerable<PdfTableRow> EnumerateRows()
+    public IEnumerable<P2PdfTableRow> EnumerateRows()
     {
         ParsingOptions options = new()
         {
@@ -35,14 +35,14 @@ internal class P2PdfDocument
 
             foreach (Table table in tables)
             {
-                List<PdfTableRow> rows = table.Rows
-                    .Select(x => new PdfTableRow(x))
+                List<P2PdfTableRow> rows = table.Rows
+                    .Select(x => new P2PdfTableRow(x))
                     .ToList();
 
                 if (rows.Count == 0)
                     continue;
 
-                foreach (PdfTableRow row in rows)
+                foreach (P2PdfTableRow row in rows)
                    yield return row;
             }
         }

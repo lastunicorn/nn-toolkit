@@ -1,15 +1,15 @@
 using System.Collections;
 using Tabula;
 
-namespace DustInTheWind.NN.Toolkit.Pilonul2;
+namespace DustInTheWind.NN.Toolkit.P2;
 
-internal class PdfTableRow : IEnumerable<string>
+internal class P2PdfTableRow : IEnumerable<string>
 {
     private readonly string[] values = new string[7];
 
     public string this[int i] => values[i];
 
-    public PdfTableRow(IReadOnlyList<RectangularTextContainer> row)
+    public P2PdfTableRow(IReadOnlyList<RectangularTextContainer> row)
     {
         if (row.Count >= 15)
             ParseWideRow(row);

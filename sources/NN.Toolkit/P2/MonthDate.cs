@@ -1,4 +1,4 @@
-﻿namespace DustInTheWind.NN.Toolkit.Pilonul2;
+﻿namespace DustInTheWind.NN.Toolkit.P2;
 
 public record struct MonthDate
 {

@@ -1,5 +1,5 @@
 ﻿using DustInTheWind.ConsoleTools.Controls.Tables;
-using DustInTheWind.NN.Toolkit.Pilonul2;
+using DustInTheWind.NN.Toolkit.P2;
 
 namespace DustInTheWind.NN.Toolkit.Cli;
 
