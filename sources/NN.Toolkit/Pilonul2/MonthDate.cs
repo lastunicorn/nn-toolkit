@@ -1,17 +1,17 @@
 ﻿namespace DustInTheWind.NN.Toolkit.Pilonul2;
 
-public struct MonthDate
+public record struct MonthDate
 {
-    public int Year { get; set; }
+    public int Year { get; private init; }
 
-    public int Month { get; set; }
+    public int Month { get; private init; }
 
     public MonthDate(int year, int month)
     {
         if (year <= 0)
             throw new ArgumentOutOfRangeException("Invalid year.");
 
-        if (month <= 0 || month > 12)
+        if (month is <= 0 or > 12)
             throw new ArgumentOutOfRangeException("Invalid month.");
 
         Year = year;

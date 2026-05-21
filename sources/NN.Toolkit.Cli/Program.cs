@@ -7,7 +7,7 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        ContributionsDocument document = ContributionsDocument.LoadFromFile(Path.Combine("Data", "contributions.pdf"));
+        ContributionsDocument document = ContributionsDocument.LoadFromFile("contributions.pdf");
 
         DataGrid dataGrid = new();
 
@@ -18,8 +18,6 @@ internal class Program
         dataGrid.Columns.Add("Unit Value");
         dataGrid.Columns.Add("Unit Count");
         dataGrid.Columns.Add("Paid in Month");
-
-        //List<string> headerFields = new List<string>();
 
         using StreamWriter output = new("NN_transactions.csv");
         output.WriteLine("Security Name,Ticker Symbol,Date,Time,Value,Shares,Type,Fees,Note");
@@ -32,10 +30,8 @@ internal class Program
             dataGrid.Rows.Add(contribution.Month, contribution.GrossValue, contribution.AdministrationFee, contribution.NetValue, contribution.UnitValue, contribution.UnitCount,
                 contribution.PaidInMonth);
 
-            //var paid = cols[6].Split('/');
             string date = $"{contribution.PaidInMonth.Year:00}-{contribution.PaidInMonth.Month:00}-01";
-            //var note = string.Join("; ", headerFields.Zip(cols, (h, v) => $"{h}={v}"));
-            string note = "aaa";
+            string note = string.Join("; ", document.ColumnNames.Zip(contribution.ToStringArray(), (h, v) => $"{h}={v}"));
 
             output.WriteLine($"NN,NN,{date},08:05,{contribution.GrossValue},{contribution.UnitCount},Buy,{contribution.AdministrationFee},\"{note}\"");
             cashOutput.WriteLine($"Deposit,NN,{date},08:00,{contribution.GrossValue},\"Luna: {contribution.Month}\"");
