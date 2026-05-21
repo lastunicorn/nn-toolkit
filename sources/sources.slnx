@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="NN.Toolkit.Cli/NN.Toolkit.Cli.csproj" />
+  <Project Path="NN.Toolkit/NN.Toolkit.csproj" />
+</Solution>
