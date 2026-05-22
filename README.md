@@ -14,10 +14,8 @@ The package is published as `DustInTheWind.NN.Toolkit`.
 The current public functionality is centered around one workflow:
 
 1. Load a PDF exported from the NN Direct mobile app.
-2. Parse the contributions table across all pages.
-3. Return:
-   - a strongly-typed `ContributionsDocument` (header + contribution rows)
-   - parsing diagnostics (`DocumentParsingDiagnostics`) so you can inspect how extraction behaved.
+2. Parse the contributions table across all pages: `ContributionsDocument`
+3. Provide parsing diagnostics: `DocumentParsingDiagnostics`
 
 ## Installation
 
@@ -40,7 +38,9 @@ dotnet add package DustInTheWind.NN.Toolkit
 
 If you are consuming the NuGet package, transitive dependencies are resolved automatically.
 
-## Export The Contributions PDF From NN Direct
+## Quick Start
+
+### a) Export the Contributions PDF From NN Direct
 
 In NN Direct mobile app:
 
@@ -52,7 +52,7 @@ In NN Direct mobile app:
 
 You will get a PDF containing contribution rows that can be parsed with this toolkit.
 
-## Quick Start
+### b) Parse the Exported Document
 
 Create a small console app and parse your exported file:
 
@@ -60,21 +60,13 @@ Create a small console app and parse your exported file:
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
 DocumentLoadResult result = ContributionsDocument.LoadFromFile("contributions.pdf");
-
 ContributionsDocument document = result.Document;
-
-Console.WriteLine($"Rows: {document.Count}");
 
 foreach (Contribution contribution in document)
 {
-	Console.WriteLine(
-		$"Month={contribution.Month}, Gross={contribution.GrossValue}, Net={contribution.NetValue}, PaidInMonth={contribution.PaidInMonth}");
+	...
 }
-
-Console.WriteLine($"Pages parsed: {result.Diagnostics.Pages.Count}");
 ```
-
-`LoadFromFile()` is the main entry point and returns both data and diagnostics.
 
 ## `Contribution` Record
 
@@ -96,8 +88,6 @@ Each row is mapped to:
 
 When a document is parsed using `ContributionsDocument.LoadFromFile()`, both the parsed data and parsing diagnostics are returned.
 
-### Practical Example
-
 ```csharp
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
@@ -106,46 +96,7 @@ DocumentLoadResult result = ContributionsDocument.LoadFromFile("contributions.pd
 
 foreach (PageParsingDiagnostics page in result.Diagnostics.Pages)
 {
-	int totalRows = page.Tables.Sum(t => t.RowCount);
-
-	Console.WriteLine(
-		$"Page {page.PageIndex}: Fallback={page.UsedFallbackExtraction}, Tables={page.Tables.Count}, Rows={totalRows}");
-}
-```
-
-`UsedFallbackExtraction` is true when the algorithm detecting tables in the PDF page did not succeeded from the first try and used a fall-back approach. See the code if more details are needed.
-
-## Error Handling And Failure Modes
-
-### Exceptions You May See
-
-- `ArgumentNullException`: when required arguments are null in lower-level APIs.
-- `ArgumentOutOfRangeException`: for invalid month/year values or invalid column index access.
-- `InvalidDataException` (`DustInTheWind.NN.Toolkit.MandatoryPrivatePension.InvalidDataException`): when a table cell cannot be parsed to the expected type (date/decimal). The exception message includes the raw value and the full row.
-- `InvalidOperationException`: if PDF row enumeration is attempted before opening a PDF document in internal flow.
-- Exceptions from the underlying PDF pipeline (for example file access or malformed PDF scenarios).
-
-### Recommended Consumer Pattern
-
-Wrap parsing in `try/catch`, then inspect diagnostics when parsing succeeds:
-
-```csharp
-using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
-
-try
-{
-	DocumentLoadResult result = ContributionsDocument.LoadFromFile("contributions.pdf");
-
-	// Use result.Document
-	// Inspect result.Diagnostics
-}
-catch (InvalidDataException ex)
-{
-	Console.Error.WriteLine($"Could not parse contribution data: {ex.Message}");
-}
-catch (Exception ex)
-{
-	Console.Error.WriteLine($"Parsing failed: {ex.Message}");
+	...
 }
 ```
 
