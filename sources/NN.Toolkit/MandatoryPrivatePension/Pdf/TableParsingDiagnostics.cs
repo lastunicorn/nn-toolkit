@@ -1,6 +1,6 @@
 namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
-public class TableParsingStatistics
+public class TableParsingDiagnostics
 {
     public int RowCount { get; set; }
 

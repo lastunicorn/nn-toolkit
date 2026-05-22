@@ -39,7 +39,7 @@ public class ContributionsDocument : Collection<Contribution>
         return new DocumentLoadResult
         {
             Document = document,
-            Statistics = pdfDocument.ParsingStatistics
+            Diagnostics = pdfDocument.ParsingDiagnostics
         };
     }
 }

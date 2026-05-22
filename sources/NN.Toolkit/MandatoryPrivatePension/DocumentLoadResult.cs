@@ -6,5 +6,5 @@ public class DocumentLoadResult
 {
     public ContributionsDocument Document { get; set; }
 
-    public DocumentParsingStatistics Statistics { get; set; }
+    public DocumentParsingDiagnostics Diagnostics { get; set; }
 }

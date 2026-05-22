@@ -13,7 +13,7 @@ internal static class Program
 
         Export(documentLoadResult.Document);
         DisplayData(documentLoadResult.Document);
-        DisplayStatistics(documentLoadResult.Statistics);
+        DisplayStatistics(documentLoadResult.Diagnostics);
     }
 
     private static void Export(ContributionsDocument document)
@@ -55,24 +55,24 @@ internal static class Program
         dataGrid.Display();
     }
 
-    private static void DisplayStatistics(DocumentParsingStatistics statistics)
+    private static void DisplayStatistics(DocumentParsingDiagnostics diagnostics)
     {
-        DataGrid statisticsGrid = new();
+        DataGrid diagnosticsGrid = new();
 
-        statisticsGrid.Columns.Add($"Pages ({statistics.Pages.Count})");
-        statisticsGrid.Columns.Add("Table Count", HorizontalAlignment.Right);
-        statisticsGrid.Columns.Add("Row Count", HorizontalAlignment.Right);
+        diagnosticsGrid.Columns.Add($"Pages ({diagnostics.Pages.Count})");
+        diagnosticsGrid.Columns.Add("Table Count", HorizontalAlignment.Right);
+        diagnosticsGrid.Columns.Add("Row Count", HorizontalAlignment.Right);
 
-        foreach (PageParsingStatistics page in statistics.Pages)
+        foreach (PageParsingDiagnostics page in diagnostics.Pages)
         {
             int tableCount =  page.Tables.Count;
             int rowCount = page.Tables
                 .Select(x => x.RowCount)
                 .Sum();
             
-            statisticsGrid.Rows.Add($"Page {page.PageIndex}", tableCount, rowCount);
+            diagnosticsGrid.Rows.Add($"Page {page.PageIndex}", tableCount, rowCount);
         }
 
-        statisticsGrid.Display();
+        diagnosticsGrid.Display();
     }
 }

@@ -9,7 +9,7 @@ internal sealed class P2PdfDocument : IDisposable
     private PdfDocument pdfDocument;
     private bool isDisposed;
     
-    public DocumentParsingStatistics ParsingStatistics { get; private set; }
+    public DocumentParsingDiagnostics ParsingDiagnostics { get; private set; }
 
     public P2PdfDocument(string filePath)
     {
@@ -38,22 +38,22 @@ internal sealed class P2PdfDocument : IDisposable
         if (pdfDocument is null)
             throw new InvalidOperationException("The pdf document is not open. Call Open() before EnumerateRows().");
 
-        ParsingStatistics = new DocumentParsingStatistics();
+        ParsingDiagnostics = new DocumentParsingDiagnostics();
         IEnumerable<P2PdfPage> pages = EnumeratePages();
 
         foreach (P2PdfPage page in pages)
         {
-            PageParsingStatistics pageParsingStatistics = ParsingStatistics.AddPage(page.PageIndex);
+            PageParsingDiagnostics pageParsingDiagnostics = ParsingDiagnostics.AddPage(page.PageIndex);
             IEnumerable<P2PdfTable> tables = page.EnumerateTables();
 
             foreach (P2PdfTable table in tables)
             {
-                TableParsingStatistics tableParsingStatistics = pageParsingStatistics.AddTable();
+                TableParsingDiagnostics tableParsingDiagnostics = pageParsingDiagnostics.AddTable();
                 IEnumerable<P2PdfTableRow> rows = table.EnumerateRows();
 
                 foreach (P2PdfTableRow row in rows)
                 {
-                    tableParsingStatistics.RowCount++;
+                    tableParsingDiagnostics.RowCount++;
                     yield return row;
                 }
             }
