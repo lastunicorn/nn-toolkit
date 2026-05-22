@@ -1,6 +1,6 @@
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
-namespace DustInTheWind.NN.Toolkit.Cli;
+namespace DustInTheWind.NN.Toolkit.Cli.Export;
 
 internal sealed class NnCashTransactionsFile : IDisposable, IAsyncDisposable
 {

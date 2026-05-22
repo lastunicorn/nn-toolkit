@@ -1,5 +1,6 @@
 ﻿using DustInTheWind.ConsoleTools.Controls;
 using DustInTheWind.ConsoleTools.Controls.Tables;
+using DustInTheWind.NN.Toolkit.Cli.Export;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
@@ -9,26 +10,19 @@ internal static class Program
 {
     internal static void Main(string[] args)
     {
-        DocumentLoadResult documentLoadResult = ContributionsDocument.LoadFromFile("contributions.pdf");
+        string inputPdfPath = args.FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(inputPdfPath))
+            inputPdfPath = "contributions.pdf";
 
+        DocumentLoadResult documentLoadResult = ContributionsDocument.LoadFromFile(inputPdfPath);
+
+        DisplayDocument(documentLoadResult.Document);
+        DisplayParsingDiagnostics(documentLoadResult.Diagnostics);
+        
         ExportToCsv(documentLoadResult.Document);
-        DisplayData(documentLoadResult.Document);
-        DisplayStatistics(documentLoadResult.Diagnostics);
     }
 
-    private static void ExportToCsv(ContributionsDocument document)
-    {
-        using NnTransactionsFile nnTransactionsFile = new("NN_transactions.csv");
-        using NnCashTransactionsFile nnCashTransactionsFile = new("NN_cash_transactions.csv");
-
-        foreach (Contribution contribution in document)
-        {
-            nnTransactionsFile.Write(contribution, document.Header);
-            nnCashTransactionsFile.Write(contribution);
-        }
-    }
-
-    private static void DisplayData(ContributionsDocument document)
+    private static void DisplayDocument(ContributionsDocument document)
     {
         DataGrid dataGrid = new();
 
@@ -55,7 +49,7 @@ internal static class Program
         dataGrid.Display();
     }
 
-    private static void DisplayStatistics(DocumentParsingDiagnostics diagnostics)
+    private static void DisplayParsingDiagnostics(DocumentParsingDiagnostics diagnostics)
     {
         DataGrid diagnosticsGrid = new();
 
@@ -77,5 +71,22 @@ internal static class Program
         }
 
         diagnosticsGrid.Display();
+    }
+
+    private static void ExportToCsv(ContributionsDocument document)
+    {
+        using NnTransactionsFile nnTransactionsFile = new("NN_transactions.csv");
+        using NnCashTransactionsFile nnCashTransactionsFile = new("NN_cash_transactions.csv");
+
+        foreach (Contribution contribution in document)
+        {
+            nnTransactionsFile.Write(contribution, document.Header);
+            nnCashTransactionsFile.Write(contribution);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Pdf was exported to CSV files:");
+        Console.WriteLine("  - NN_transactions.csv");
+        Console.WriteLine("  - NN_cash_transactions.csv");
     }
 }
