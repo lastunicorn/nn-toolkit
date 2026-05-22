@@ -102,6 +102,19 @@ jobs:
             echo "Missing repository secret NUGET_API_KEY."
             exit 1
           fi
+          echo "API key length: ${#NUGET_API_KEY} chars"
+          http_status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X GET "https://www.nuget.org/api/v2/verifykey/$NUGET_API_KEY/DustInTheWind.NN.Toolkit")
+          echo "NuGet API key verification status: $http_status"
+          if [ "$http_status" = "403" ]; then
+            echo "API key is invalid or does not have permission to push 'DustInTheWind.NN.Toolkit'."
+            exit 1
+          fi
+          if [ "$http_status" = "200" ]; then
+            echo "API key is valid."
+          else
+            echo "Unexpected verification response: $http_status — proceeding anyway."
+          fi
 
       - name: Push to NuGet.org
         env:
