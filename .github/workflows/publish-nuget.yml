@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       package_version:
-        description: "SemVer package version (required for manual runs)"
+        description: "Stable package version (required for manual runs)"
         required: false
         type: string
 
@@ -30,7 +30,7 @@ jobs:
             10.0.x
 
       - name: Restore (nuget.org only)
-        run: dotnet restore --configfile ./nuget.config
+        run: dotnet restore ./sources/NN.Toolkit.slnx --configfile ./nuget.config
 
       - name: Resolve package version
         id: version
@@ -54,7 +54,7 @@ jobs:
           fi
 
           if [ -z "$version" ]; then
-            echo "No package version resolved. Use a v* tag or set workflow input 'package_version'."
+            echo "No package version resolved. Use a vMAJOR.MINOR.PATCH tag or set workflow input 'package_version'."
             exit 1
           fi
 
@@ -67,7 +67,7 @@ jobs:
 
       - name: Build
         run: |
-          dotnet build -c Release --no-restore \
+          dotnet build ./sources/NN.Toolkit.slnx -c Release --no-restore \
             -p:Version="${{ steps.version.outputs.package_version }}" \
             -p:PackageVersion="${{ steps.version.outputs.package_version }}" \
             -p:AssemblyVersion="${{ steps.version.outputs.package_version }}" \
@@ -77,7 +77,7 @@ jobs:
 
       - name: Pack
         run: |
-          dotnet pack ./NN.Toolkit/NN.Toolkit.csproj \
+          dotnet pack ./sources/NN.Toolkit/NN.Toolkit.csproj \
             -c Release \
             --no-build \
             -o ./artifacts \
@@ -92,7 +92,7 @@ jobs:
         shell: bash
         run: |
           expected_version="${{ steps.version.outputs.package_version }}"
-          ls ./artifacts/*.nupkg | grep -E "\.${expected_version//./\.}\.nupkg$" >/dev/null
+          ls ./artifacts/*.nupkg | grep -E "\.${expected_version//./\\.}\.nupkg$" >/dev/null
 
       - name: Validate NuGet API key
         env:
@@ -111,4 +111,3 @@ jobs:
             --api-key "$NUGET_API_KEY" \
             --source "https://api.nuget.org/v3/index.json" \
             --skip-duplicate
-
