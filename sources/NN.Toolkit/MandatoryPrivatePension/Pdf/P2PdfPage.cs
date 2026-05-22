@@ -10,6 +10,8 @@ internal class P2PdfPage
 
     public int PageIndex { get; }
 
+    public bool UsedFallbackExtraction { get; private set; }
+
     public P2PdfPage(int pageIndex, PageArea pageArea)
     {
         PageIndex = pageIndex;
@@ -25,6 +27,8 @@ internal class P2PdfPage
         
         if (regions.Count == 0)
         {
+            UsedFallbackExtraction = true;
+
             IEnumerable<P2PdfTable> detectedOnWholePage = algorithm.Extract(pageArea)
                 .Select(x => new P2PdfTable(x));
 

@@ -57,6 +57,8 @@ internal sealed class P2PdfDocument : IDisposable
                     yield return row;
                 }
             }
+
+            pageParsingDiagnostics.UsedFallbackExtraction = page.UsedFallbackExtraction;
         }
     }
 

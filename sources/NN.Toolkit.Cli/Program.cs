@@ -48,7 +48,13 @@ internal static class Program
 
         foreach (Contribution contribution in document)
         {
-            dataGrid.Rows.Add(contribution.Month, contribution.GrossValue, contribution.AdministrationFee, contribution.NetValue, contribution.UnitValue, contribution.UnitCount,
+            dataGrid.Rows.Add(
+                contribution.Month,
+                contribution.GrossValue,
+                contribution.AdministrationFee,
+                contribution.NetValue,
+                contribution.UnitValue,
+                contribution.UnitCount,
                 contribution.PaidInMonth);
         }
 
@@ -60,17 +66,25 @@ internal static class Program
         DataGrid diagnosticsGrid = new();
 
         diagnosticsGrid.Columns.Add($"Pages ({diagnostics.Pages.Count})");
+        diagnosticsGrid.Columns.Add("Fallback");
         diagnosticsGrid.Columns.Add("Table Count", HorizontalAlignment.Right);
         diagnosticsGrid.Columns.Add("Row Count", HorizontalAlignment.Right);
 
         foreach (PageParsingDiagnostics page in diagnostics.Pages)
         {
+            string pageNumber = $"Page {page.PageIndex}";
+            
+            string usedFallbackExtraction = page.UsedFallbackExtraction
+                ? "Yes"
+                : "No";
+            
             int tableCount =  page.Tables.Count;
+            
             int rowCount = page.Tables
                 .Select(x => x.RowCount)
                 .Sum();
-            
-            diagnosticsGrid.Rows.Add($"Page {page.PageIndex}", tableCount, rowCount);
+
+            diagnosticsGrid.Rows.Add(pageNumber, usedFallbackExtraction, tableCount, rowCount);
         }
 
         diagnosticsGrid.Display();
