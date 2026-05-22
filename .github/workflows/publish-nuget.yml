@@ -106,14 +106,17 @@ jobs:
           http_status=$(curl -s -o /dev/null -w "%{http_code}" \
             -X GET "https://www.nuget.org/api/v2/verifykey/$NUGET_API_KEY/DustInTheWind.NN.Toolkit")
           echo "NuGet API key verification status: $http_status"
-          if [ "$http_status" = "403" ]; then
-            echo "API key is invalid or does not have permission to push 'DustInTheWind.NN.Toolkit'."
-            exit 1
-          fi
           if [ "$http_status" = "200" ]; then
             echo "API key is valid."
+          elif [ "$http_status" = "401" ]; then
+            echo "API key is invalid or expired. Please regenerate it on nuget.org and update the NUGET_API_KEY secret."
+            exit 1
+          elif [ "$http_status" = "403" ]; then
+            echo "API key does not have permission to push 'DustInTheWind.NN.Toolkit'. Check the key's scope on nuget.org."
+            exit 1
           else
-            echo "Unexpected verification response: $http_status — proceeding anyway."
+            echo "Unexpected verification response: $http_status. Aborting."
+            exit 1
           fi
 
       - name: Push to NuGet.org
