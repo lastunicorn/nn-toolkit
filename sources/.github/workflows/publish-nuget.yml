@@ -3,8 +3,13 @@ name: Publish NuGet package
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
   workflow_dispatch:
+    inputs:
+      package_version:
+        description: "SemVer package version (required for manual runs)"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -30,8 +35,53 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
 
+      - name: Resolve package version
+        id: version
+        shell: bash
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PACKAGE_VERSION: ${{ github.event.inputs.package_version }}
+        run: |
+          stable_tag_pattern='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+          stable_version_pattern='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+
+          if [ "$EVENT_NAME" = "push" ]; then
+            if ! [[ "$REF_NAME" =~ $stable_tag_pattern ]]; then
+              echo "Expected strict stable tag format vMAJOR.MINOR.PATCH, got '$REF_NAME'."
+              exit 1
+            fi
+            version="${REF_NAME#v}"
+          else
+            version="$INPUT_PACKAGE_VERSION"
+          fi
+
+          if [ -z "$version" ]; then
+            echo "No package version resolved. Use a v* tag or set workflow input 'package_version'."
+            exit 1
+          fi
+
+          if ! [[ "$version" =~ $stable_version_pattern ]]; then
+            echo "Invalid version '$version'. Only stable MAJOR.MINOR.PATCH is allowed."
+            exit 1
+          fi
+
+          echo "package_version=$version" >> "$GITHUB_OUTPUT"
+
       - name: Pack
-        run: dotnet pack ./NN.Toolkit/NN.Toolkit.csproj -c Release --no-build -o ./artifacts
+        run: |
+          dotnet pack ./NN.Toolkit/NN.Toolkit.csproj \
+            -c Release \
+            --no-build \
+            -o ./artifacts \
+            -p:Version="${{ steps.version.outputs.package_version }}" \
+            -p:PackageVersion="${{ steps.version.outputs.package_version }}"
+
+      - name: Validate packed version
+        shell: bash
+        run: |
+          expected_version="${{ steps.version.outputs.package_version }}"
+          ls ./artifacts/*.nupkg | grep -E "\.${expected_version//./\.}\.nupkg$" >/dev/null
 
       - name: Validate NuGet API key
         env:
