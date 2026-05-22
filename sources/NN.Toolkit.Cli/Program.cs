@@ -11,26 +11,20 @@ internal static class Program
     {
         DocumentLoadResult documentLoadResult = ContributionsDocument.LoadFromFile("contributions.pdf");
 
-        Export(documentLoadResult.Document);
+        ExportToCsv(documentLoadResult.Document);
         DisplayData(documentLoadResult.Document);
         DisplayStatistics(documentLoadResult.Diagnostics);
     }
 
-    private static void Export(ContributionsDocument document)
+    private static void ExportToCsv(ContributionsDocument document)
     {
-        using StreamWriter output = new("NN_transactions.csv");
-        output.WriteLine("Security Name,Ticker Symbol,Date,Time,Value,Shares,Type,Fees,Note");
-
-        using StreamWriter cashOutput = new("NN_cash_transactions.csv");
-        cashOutput.WriteLine("Type,Cash Account,Date,Time,Value,Note");
+        using NnTransactionsFile nnTransactionsFile = new("NN_transactions.csv");
+        using NnCashTransactionsFile nnCashTransactionsFile = new("NN_cash_transactions.csv");
 
         foreach (Contribution contribution in document)
         {
-            string date = $"{contribution.PaidInMonth.Year:00}-{contribution.PaidInMonth.Month:00}-01";
-            string note = string.Join("; ", document.Header.Zip(contribution.ToStringArray(), (h, v) => $"{h}={v}"));
-
-            output.WriteLine($"NN,NN,{date},08:05,{contribution.GrossValue},{contribution.UnitCount},Buy,{contribution.AdministrationFee},\"{note}\"");
-            cashOutput.WriteLine($"Deposit,NN,{date},08:00,{contribution.GrossValue},\"Luna: {contribution.Month}\"");
+            nnTransactionsFile.Write(contribution, document.Header);
+            nnCashTransactionsFile.Write(contribution);
         }
     }
 
@@ -66,20 +60,15 @@ internal static class Program
         DataGrid diagnosticsGrid = new();
 
         diagnosticsGrid.Columns.Add($"Pages ({diagnostics.Pages.Count})");
-        diagnosticsGrid.Columns.Add("Fallback");
+        diagnosticsGrid.Columns.Add("Use Fallback");
         diagnosticsGrid.Columns.Add("Table Count", HorizontalAlignment.Right);
         diagnosticsGrid.Columns.Add("Row Count", HorizontalAlignment.Right);
 
         foreach (PageParsingDiagnostics page in diagnostics.Pages)
         {
             string pageNumber = $"Page {page.PageIndex}";
-            
-            string usedFallbackExtraction = page.UsedFallbackExtraction
-                ? "Yes"
-                : "No";
-            
-            int tableCount =  page.Tables.Count;
-            
+            YesNoBool usedFallbackExtraction = page.UsedFallbackExtraction;
+            int tableCount = page.Tables.Count;
             int rowCount = page.Tables
                 .Select(x => x.RowCount)
                 .Sum();
