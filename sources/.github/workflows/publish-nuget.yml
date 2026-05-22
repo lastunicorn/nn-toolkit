@@ -32,9 +32,6 @@ jobs:
       - name: Restore (nuget.org only)
         run: dotnet restore --configfile ./nuget.config
 
-      - name: Build
-        run: dotnet build -c Release --no-restore
-
       - name: Resolve package version
         id: version
         shell: bash
@@ -68,6 +65,16 @@ jobs:
 
           echo "package_version=$version" >> "$GITHUB_OUTPUT"
 
+      - name: Build
+        run: |
+          dotnet build -c Release --no-restore \
+            -p:Version="${{ steps.version.outputs.package_version }}" \
+            -p:PackageVersion="${{ steps.version.outputs.package_version }}" \
+            -p:AssemblyVersion="${{ steps.version.outputs.package_version }}" \
+            -p:FileVersion="${{ steps.version.outputs.package_version }}" \
+            -p:InformationalVersion="${{ steps.version.outputs.package_version }}" \
+            -p:IncludeSourceRevisionInInformationalVersion=false
+
       - name: Pack
         run: |
           dotnet pack ./NN.Toolkit/NN.Toolkit.csproj \
@@ -75,7 +82,11 @@ jobs:
             --no-build \
             -o ./artifacts \
             -p:Version="${{ steps.version.outputs.package_version }}" \
-            -p:PackageVersion="${{ steps.version.outputs.package_version }}"
+            -p:PackageVersion="${{ steps.version.outputs.package_version }}" \
+            -p:AssemblyVersion="${{ steps.version.outputs.package_version }}" \
+            -p:FileVersion="${{ steps.version.outputs.package_version }}" \
+            -p:InformationalVersion="${{ steps.version.outputs.package_version }}" \
+            -p:IncludeSourceRevisionInInformationalVersion=false
 
       - name: Validate packed version
         shell: bash
