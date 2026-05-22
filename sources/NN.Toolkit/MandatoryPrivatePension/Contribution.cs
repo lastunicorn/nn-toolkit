@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace DustInTheWind.NN.Toolkit.P2;
+namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
 public class Contribution
 {

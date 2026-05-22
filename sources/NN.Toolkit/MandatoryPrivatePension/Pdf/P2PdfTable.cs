@@ -1,6 +1,6 @@
 using Tabula;
 
-namespace DustInTheWind.NN.Toolkit.P2.Pdf;
+namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
 internal class P2PdfTable
 {

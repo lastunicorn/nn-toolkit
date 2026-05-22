@@ -2,14 +2,17 @@ using Tabula;
 using Tabula.Detectors;
 using Tabula.Extractors;
 
-namespace DustInTheWind.NN.Toolkit.P2.Pdf;
+namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
 internal class P2PdfPage
 {
     private readonly PageArea pageArea;
 
-    public P2PdfPage(PageArea pageArea)
+    public int PageIndex { get; set; }
+
+    public P2PdfPage(int pageIndex, PageArea pageArea)
     {
+        PageIndex = pageIndex;
         this.pageArea = pageArea ?? throw new ArgumentNullException(nameof(pageArea));
     }
 

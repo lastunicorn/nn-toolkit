@@ -1,17 +1,18 @@
 ﻿using System.Collections.ObjectModel;
-using DustInTheWind.NN.Toolkit.P2.Pdf;
+using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
-namespace DustInTheWind.NN.Toolkit.P2;
+namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
 public class ContributionsDocument : Collection<Contribution>
 {
     public ContributionsHeader Header { get; } = [];
 
-    public static ContributionsDocument LoadFromFile(string filePath)
+    public static DocumentLoadResult LoadFromFile(string filePath)
     {
         ContributionsDocument document = [];
 
-        P2PdfDocument pdfDocument = new(filePath);
+        using P2PdfDocument pdfDocument = new(filePath);
+        pdfDocument.Open();
         IEnumerable<P2PdfTableRow> rows = pdfDocument.EnumerateRows();
 
         using IEnumerator<P2PdfTableRow> rowEnumerator = rows.GetEnumerator();
@@ -35,6 +36,10 @@ public class ContributionsDocument : Collection<Contribution>
             });
         }
 
-        return document;
+        return new DocumentLoadResult
+        {
+            Document = document,
+            Statistics = pdfDocument.ParsingStatistics
+        };
     }
 }

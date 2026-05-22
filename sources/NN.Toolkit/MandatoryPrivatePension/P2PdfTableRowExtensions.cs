@@ -1,6 +1,6 @@
-using DustInTheWind.NN.Toolkit.P2.Pdf;
+using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
-namespace DustInTheWind.NN.Toolkit.P2;
+namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
 internal static class P2PdfTableRowExtensions
 {
