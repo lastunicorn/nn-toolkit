@@ -109,11 +109,14 @@ jobs:
             exit 1
           fi
           echo "API key length: ${#NUGET_API_KEY} chars"
-          echo "API key prefix: ${NUGET_API_KEY:0:8}..."
-          http_status=$(curl -s -o /dev/null -w "%{http_code}" \
+          response=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -X POST \
             -H "X-NuGet-ApiKey: $NUGET_API_KEY" \
-            "https://www.nuget.org/api/v2/verifykey/DustInTheWind.NN.Toolkit")
+            "https://www.nuget.org/api/v2/package/create-verification-key/DustInTheWind.NN.Toolkit")
+          http_status=$(echo "$response" | grep "HTTP_STATUS:" | cut -d: -f2)
+          body=$(echo "$response" | grep -v "HTTP_STATUS:")
           echo "NuGet API key verification status: $http_status"
+          echo "Response body: $body"
           if [ "$http_status" = "200" ]; then
             echo "API key is valid."
           elif [ "$http_status" = "401" ]; then
