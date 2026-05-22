@@ -107,7 +107,11 @@ jobs:
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
-          dotnet nuget push "./artifacts/*.nupkg" \
+          output=$(dotnet nuget push "./artifacts/*.nupkg" \
             --api-key "$NUGET_API_KEY" \
             --source "https://api.nuget.org/v3/index.json" \
-            --skip-duplicate
+            --skip-duplicate 2>&1) || true
+          echo "$output"
+          if echo "$output" | grep -qiE "error|failed" && ! echo "$output" | grep -qi "already exists"; then
+            exit 1
+          fi
