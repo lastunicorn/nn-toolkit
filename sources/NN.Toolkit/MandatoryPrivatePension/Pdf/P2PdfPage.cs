@@ -8,7 +8,7 @@ internal class P2PdfPage
 {
     private readonly PageArea pageArea;
 
-    public int PageIndex { get; set; }
+    public int PageIndex { get; }
 
     public P2PdfPage(int pageIndex, PageArea pageArea)
     {
@@ -24,7 +24,15 @@ internal class P2PdfPage
         IReadOnlyList<TableRectangle> regions = detector.Detect(pageArea);
         
         if (regions.Count == 0)
+        {
+            IEnumerable<P2PdfTable> detectedOnWholePage = algorithm.Extract(pageArea)
+                .Select(x => new P2PdfTable(x));
+
+            foreach (P2PdfTable p2PdfTable in detectedOnWholePage)
+                yield return p2PdfTable;
+
             yield break;
+        }
 
         foreach (TableRectangle region in regions)
         {
