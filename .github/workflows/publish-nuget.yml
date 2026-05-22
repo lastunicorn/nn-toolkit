@@ -88,6 +88,12 @@ jobs:
             -p:InformationalVersion="${{ steps.version.outputs.package_version }}" \
             -p:IncludeSourceRevisionInInformationalVersion=false
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: ./artifacts/*.nupkg
+
       - name: Validate packed version
         shell: bash
         run: |
