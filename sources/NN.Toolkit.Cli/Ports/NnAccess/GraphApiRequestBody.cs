@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromWeb;
+namespace DustInTheWind.NN.Toolkit.Cli.Ports.NnAccess;
 
 internal class GraphApiRequestBody
 {

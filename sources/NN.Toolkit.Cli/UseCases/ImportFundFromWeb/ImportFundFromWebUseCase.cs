@@ -5,27 +5,27 @@ using DustInTheWind.ConsoleTools.Controls;
 using DustInTheWind.ConsoleTools.Controls.Tables;
 using DustInTheWind.NN.Toolkit.Cli.Domain;
 using DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
+using DustInTheWind.NN.Toolkit.Cli.Ports.NnAccess;
 
 namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromWeb;
 
 internal class ImportFundFromWebUseCase : IUseCase
 {
-	private static readonly JsonSerializerOptions JsonSerializerOptions = new()
-	{
-		WriteIndented = true
-	};
+	private readonly IUnitOfWork unitOfWork;
+	private readonly INnApiClient nnApiClient;
 
-	private readonly UnitOfWork unitOfWork;
+	private static readonly DateOnly UnixEpoch = new(1970, 1, 1);
 
 	public DateOnly? FromDate { get; init; }
-	
+
 	public DateOnly? ToDate { get; init; }
-	
+
 	public int? Year { get; init; }
 
-	public ImportFundFromWebUseCase(UnitOfWork unitOfWork)
+	public ImportFundFromWebUseCase(IUnitOfWork unitOfWork, INnApiClient nnApiClient)
 	{
 		this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+		this.nnApiClient = nnApiClient ?? throw new ArgumentNullException(nameof(nnApiClient));
 	}
 
 	public async Task Execute()
@@ -43,49 +43,72 @@ internal class ImportFundFromWebUseCase : IUseCase
 
 	private async Task<IEnumerable<FundNav>> ReadFromNnApi()
 	{
-		long dateRangeFrom = new DateTimeOffset(Year.Value, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
-		long dateRangeTo = new DateTimeOffset(Year.Value, 12, 31, 23, 59, 59, TimeSpan.Zero).ToUnixTimeMilliseconds();
+		DateOnly fromDate = Year != null
+			? new DateOnly(Year.Value, 1, 1)
+			: FromDate ?? UnixEpoch;
 
-		int numberOfPoints = DateTime.IsLeapYear(Year.Value) ? 366 : 365;
+		DateOnly toDate = Year != null
+			? new DateOnly(Year.Value, 12, 31)
+			: ToDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
 
-		GraphApiRequestBody graphApiRequestBody = new()
-		{
-			Bl = "2",
-			NumberOfPoints = numberOfPoints,
-			Currency = "LEI",
-			DateRangeFrom = dateRangeFrom,
-			DateRangeTo = dateRangeTo
-		};
+		int numberOfPoints = toDate.DayNumber - fromDate.DayNumber + 1;
 
-		using HttpClient http = new HttpClient();
+		IEnumerable<NnGraphValue> values = await nnApiClient.GetGraph(fromDate, toDate, numberOfPoints);
 
-		string requestBody = JsonSerializer.Serialize(graphApiRequestBody, JsonSerializerOptions);
-		using StringContent content = new(requestBody, Encoding.UTF8, "application/json");
-		HttpResponseMessage response = await http.PostAsync("https://www.nn.ro/api/graph/post", content);
-		response.EnsureSuccessStatusCode();
-
-		string json = await response.Content.ReadAsStringAsync();
-		using JsonDocument envelope = JsonDocument.Parse(json);
-		using JsonDocument doc = JsonDocument.Parse(envelope.RootElement.GetString()!);
-
-		List<FundNav> fundNavs = [];
-
-		foreach (JsonElement item in doc.RootElement[0].GetProperty("data").EnumerateArray())
-		{
-			string date = DateTimeOffset.FromUnixTimeMilliseconds(item[0].GetInt64()).ToString("yyyy-MM-dd");
-			string value = item[1].GetRawText();
-
-			FundNav fundNav = new()
+		return values
+			.Select(x => new FundNav
 			{
-				Date = DateOnly.Parse(date),
-				Value = decimal.Parse(value)
-			};
-
-			fundNavs.Add(fundNav);
-		}
-
-		return fundNavs;
+				Date = x.Date,
+				Value = x.Value
+			})
+			.ToList();
 	}
+
+	// private async Task<IEnumerable<FundNav>> ReadFromNnApi()
+	// {
+	// 	long dateRangeFrom = new DateTimeOffset(Year.Value, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
+	// 	long dateRangeTo = new DateTimeOffset(Year.Value, 12, 31, 23, 59, 59, TimeSpan.Zero).ToUnixTimeMilliseconds();
+	//
+	// 	int numberOfPoints = DateTime.IsLeapYear(Year.Value) ? 366 : 365;
+	//
+	// 	GraphApiRequestBody graphApiRequestBody = new()
+	// 	{
+	// 		Bl = "2",
+	// 		NumberOfPoints = numberOfPoints,
+	// 		Currency = "LEI",
+	// 		DateRangeFrom = dateRangeFrom,
+	// 		DateRangeTo = dateRangeTo
+	// 	};
+	//
+	// 	using HttpClient http = new HttpClient();
+	//
+	// 	string requestBody = JsonSerializer.Serialize(graphApiRequestBody, JsonSerializerOptions);
+	// 	using StringContent content = new(requestBody, Encoding.UTF8, "application/json");
+	// 	HttpResponseMessage response = await http.PostAsync("https://www.nn.ro/api/graph/post", content);
+	// 	response.EnsureSuccessStatusCode();
+	//
+	// 	string json = await response.Content.ReadAsStringAsync();
+	// 	using JsonDocument envelope = JsonDocument.Parse(json);
+	// 	using JsonDocument doc = JsonDocument.Parse(envelope.RootElement.GetString()!);
+	//
+	// 	List<FundNav> fundNavs = [];
+	//
+	// 	foreach (JsonElement item in doc.RootElement[0].GetProperty("data").EnumerateArray())
+	// 	{
+	// 		string date = DateTimeOffset.FromUnixTimeMilliseconds(item[0].GetInt64()).ToString("yyyy-MM-dd");
+	// 		string value = item[1].GetRawText();
+	//
+	// 		FundNav fundNav = new()
+	// 		{
+	// 			Date = DateOnly.Parse(date),
+	// 			Value = decimal.Parse(value)
+	// 		};
+	//
+	// 		fundNavs.Add(fundNav);
+	// 	}
+	//
+	// 	return fundNavs;
+	// }
 
 	private ImportDiagnostics Import(IEnumerable<FundNav> fundNavs)
 	{

@@ -1,5 +1,5 @@
 using DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
-using DustInTheWind.NN.Toolkit.Cli.Ports.Export;
+using DustInTheWind.NN.Toolkit.Cli.Ports.FileSystemAccess;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
 namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
@@ -7,12 +7,14 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
 internal class ExportAccountUseCase : IUseCase
 {
     private readonly IUnitOfWork unitOfWork;
-    
+    private readonly IFileSystemService fileSystemService;
+
     public string ExportFormat { get; init; }
 
-    public ExportAccountUseCase(IUnitOfWork unitOfWork)
+    public ExportAccountUseCase(IUnitOfWork unitOfWork , IFileSystemService fileSystemService)
     {
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        this.fileSystemService = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
     }
 
     public async Task Execute()
@@ -32,7 +34,7 @@ internal class ExportAccountUseCase : IUseCase
         }
     }
 
-    private static async Task ExportToCsv(IEnumerable<Contribution> contributions)
+    private async Task ExportToCsv(IEnumerable<Contribution> contributions)
     {
         string[] labels =
         [
@@ -45,13 +47,16 @@ internal class ExportAccountUseCase : IUseCase
             "Plătită în luna"
         ];
         
-        await using NnTransactionsFile nnTransactionsFile = new("NN_transactions.csv", labels);
-        await using NnCashTransactionsFile nnCashTransactionsFile = new("NN_cash_transactions.csv");
+        StreamWriter nnTransactionsStreamWriter = fileSystemService.OpenStreamWriter("NN_transactions.csv");
+        StreamWriter nnCashTransactionsStreamWriter =  fileSystemService.OpenStreamWriter("NN_cash_transactions.csv");
+        
+        await using NnTransactionsDocument nnTransactionsDocument = new(nnTransactionsStreamWriter, labels);
+        await using NnCashTransactionsDocument nnCashTransactionsDocument = new(nnCashTransactionsStreamWriter);
 
         foreach (Contribution contribution in contributions)
         {
-            await nnTransactionsFile.WriteAsync(contribution);
-            await nnCashTransactionsFile.WriteAsync(contribution);
+            await nnTransactionsDocument.WriteAsync(contribution);
+            await nnCashTransactionsDocument.WriteAsync(contribution);
         }
 
         Console.WriteLine();

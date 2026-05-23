@@ -1,6 +1,7 @@
 ﻿using DustInTheWind.ConsoleTools.Arguments;
 using DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.Ports.FileSystemAccess;
+using DustInTheWind.NN.Toolkit.Cli.Ports.NnAccess;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearFund;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
@@ -73,8 +74,7 @@ internal static class Program
 
 		Argument fileArgument = arguments["file"] ?? arguments[2];
 
-		Database database = new();
-		database.OpenAsync().GetAwaiter().GetResult();
+		Database database = OpenDatabase();
 		UnitOfWork unitOfWork = new(database);
 		return new ImportAccountUseCase(unitOfWork)
 		{
@@ -96,10 +96,10 @@ internal static class Program
 
 		Argument formatArgument = arguments["format"];
 
-		Database database = new();
-		database.OpenAsync().GetAwaiter().GetResult();
+		Database database = OpenDatabase();
 		UnitOfWork unitOfWork = new(database);
-		return new ExportAccountUseCase(unitOfWork)
+		FileSystemService  fileSystemService = new();
+		return new ExportAccountUseCase(unitOfWork, fileSystemService)
 		{
 			ExportFormat = formatArgument?.Value
 		};
@@ -117,8 +117,7 @@ internal static class Program
 		if (verb?.Value != "clear")
 			return null;
 
-		Database database = new();
-		database.OpenAsync().GetAwaiter().GetResult();
+		Database database = OpenDatabase();
 		UnitOfWork unitOfWork = new(database);
 		return new ClearAccountUseCase(unitOfWork);
 	}
@@ -135,8 +134,7 @@ internal static class Program
 		if (verb != null && verb.Value != "show")
 			return null;
 
-		Database database = new();
-		database.OpenAsync().GetAwaiter().GetResult();
+		Database database = OpenDatabase();
 		UnitOfWork unitOfWork = new(database);
 		return new ShowAccountUseCase(unitOfWork);
 	}
@@ -161,8 +159,7 @@ internal static class Program
 			{
 				Argument fileArgument = arguments["file"];
 
-				Database database = new();
-				database.OpenAsync().GetAwaiter().GetResult();
+				Database database = OpenDatabase();
 				UnitOfWork unitOfWork = new(database);
 				FileSystemService fileSystemService = new();
 				return new ImportFundFromFileUseCase(unitOfWork, fileSystemService)
@@ -177,8 +174,7 @@ internal static class Program
 
 			if (fileArgument != null)
 			{
-				Database database = new();
-				database.OpenAsync().GetAwaiter().GetResult();
+				Database database = OpenDatabase();
 				UnitOfWork unitOfWork = new(database);
 				FileSystemService fileSystemService = new();
 				return new ImportFundFromFileUseCase(unitOfWork, fileSystemService)
@@ -216,10 +212,10 @@ internal static class Program
 
 				int year = int.Parse(yearArgument.Value);
 
-				Database database = new();
-				database.OpenAsync().GetAwaiter().GetResult();
+				Database database = OpenDatabase();
 				UnitOfWork unitOfWork = new(database);
-				return new ImportFundFromWebUseCase(unitOfWork)
+				NnApiClient nnApiClient = new();
+				return new ImportFundFromWebUseCase(unitOfWork, nnApiClient)
 				{
 					Year = year
 				};
@@ -235,10 +231,10 @@ internal static class Program
 
 			if (yearArgument != null)
 			{
-				Database database = new();
-				database.OpenAsync().GetAwaiter().GetResult();
+				Database database = OpenDatabase();
 				UnitOfWork unitOfWork = new(database);
-				return new ImportFundFromWebUseCase(unitOfWork)
+				NnApiClient nnApiClient = new();
+				return new ImportFundFromWebUseCase(unitOfWork, nnApiClient)
 				{
 					Year = year
 				};
@@ -265,8 +261,7 @@ internal static class Program
 		if (fileArgument == null)
 			return null;
 
-		Database database = new();
-		database.OpenAsync().GetAwaiter().GetResult();
+		Database database = OpenDatabase();
 		UnitOfWork unitOfWork = new(database);
 		FileSystemService fileSystemService = new();
 		return new ExportFundUseCase(unitOfWork, fileSystemService)
@@ -287,8 +282,7 @@ internal static class Program
 		if (verb?.Value != "clear")
 			return null;
 
-		Database database = new();
-		database.OpenAsync().GetAwaiter().GetResult();
+		Database database = OpenDatabase();
 		UnitOfWork unitOfWork = new(database);
 		return new ClearFundUseCase(unitOfWork);
 	}
@@ -305,8 +299,7 @@ internal static class Program
 		if (verb != null && verb.Value != "show")
 			return null;
 
-		Database database = new();
-		database.OpenAsync().GetAwaiter().GetResult();
+		Database database = OpenDatabase();
 		UnitOfWork unitOfWork = new(database);
 		return new ShowFundUseCase(unitOfWork);
 	}
@@ -314,5 +307,12 @@ internal static class Program
 	private static IUseCase TryCreateHelpUseCase(Arguments arguments)
 	{
 		return new HelpUseCase();
+	}
+
+	private static Database OpenDatabase()
+	{
+		Database database = new();
+		database.OpenAsync().GetAwaiter().GetResult();
+		return database;
 	}
 }
