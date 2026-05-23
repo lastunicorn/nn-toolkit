@@ -3,7 +3,7 @@ using DustInTheWind.ConsoleTools.Controls.Tables;
 using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
-namespace DustInTheWind.NN.Toolkit.Cli.UseCases;
+namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ShowAccount;
 
 internal class ShowAccountUseCase : IUseCase
 {
@@ -28,6 +28,7 @@ internal class ShowAccountUseCase : IUseCase
         dataGrid.Columns.Add("Paid in Month", HorizontalAlignment.Center);
 
         foreach (Contribution contribution in contributions)
+        {
             dataGrid.Rows.Add(
                 contribution.Month,
                 contribution.GrossValue,
@@ -36,6 +37,7 @@ internal class ShowAccountUseCase : IUseCase
                 contribution.UnitValue,
                 contribution.UnitCount,
                 contribution.PaidInMonth);
+        }
 
         dataGrid.Display();
     }

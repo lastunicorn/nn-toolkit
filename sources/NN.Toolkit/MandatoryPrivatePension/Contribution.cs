@@ -18,6 +18,25 @@ public class Contribution
 
     public MonthDate PaidInMonth { get; set; }
 
+    public override bool Equals(object obj)
+    {
+        if (obj is not Contribution other)
+            return false;
+
+        return Month == other.Month
+            && GrossValue == other.GrossValue
+            && AdministrationFee == other.AdministrationFee
+            && NetValue == other.NetValue
+            && UnitValue == other.UnitValue
+            && UnitCount == other.UnitCount
+            && PaidInMonth == other.PaidInMonth;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Month, GrossValue, AdministrationFee, NetValue, UnitValue, UnitCount, PaidInMonth);
+    }
+
     public string[] ToStringArray()
     {
         return

@@ -38,6 +38,11 @@ public class ContributionRepository
         contributions.Add(contribution);
     }
 
+    public void Clear()
+    {
+        contributions.Clear();
+    }
+
     public void SaveChanges()
     {
         SaveContributions();

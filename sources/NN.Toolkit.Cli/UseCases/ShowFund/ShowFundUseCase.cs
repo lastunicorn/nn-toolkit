@@ -1,4 +1,4 @@
-namespace DustInTheWind.NN.Toolkit.Cli.UseCases;
+namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ShowFund;
 
 internal class ShowFundUseCase : IUseCase
 {

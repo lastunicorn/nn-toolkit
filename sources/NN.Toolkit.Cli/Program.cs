@@ -1,48 +1,36 @@
 ﻿using DustInTheWind.ConsoleTools.Arguments;
-using DustInTheWind.ConsoleTools.Controls;
-using DustInTheWind.ConsoleTools.Controls.Tables;
 using DustInTheWind.NN.Toolkit.Cli.DataAccess;
-using DustInTheWind.NN.Toolkit.Cli.Export;
-using DustInTheWind.NN.Toolkit.Cli.UseCases;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.Help;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportAccount;
-using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
-using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.ShowAccount;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.ShowFund;
 
 namespace DustInTheWind.NN.Toolkit.Cli;
 
+// account import [<pdf-file-path>] - Imports 
+// account import [--file <pdf-file-path>]
+// account clear
+// account export [--format pp]
+// account
+
+// fund import --from 2026-01-01 --to 2026-12-31
+// fund import --year 2026
+// fund import --file "historical_2008.csv"
+// fund clear
+// fund
+
+// help
+
 internal static class Program
 {
-    // account import "contributions.pdf"
-    // account import --file "contributions.pdf"
-    // account clear
-    // account export --format pp
-    // account
-
-    // fund import --from 2026-01-01 --to 2026-12-31
-    // fund import --year 2026
-    // fund import --file "historical_2008.csv"
-    // fund clear
-    // fund
-
-    // help
-
     internal static void Main(string[] args)
     {
         Arguments arguments = new(args);
 
         IUseCase useCase = CreateUseCase(arguments) ?? new HelpUseCase();
         useCase.Execute();
-
-        // if (string.IsNullOrWhiteSpace(noun))
-        //     noun = "contributions.pdf";
-        //
-        // DocumentLoadResult documentLoadResult = ContributionsDocument.LoadFromFile(noun);
-        //
-        // DisplayDocument(documentLoadResult.Document);
-        // DisplayParsingDiagnostics(documentLoadResult.Diagnostics);
-        //
-        // ExportToCsv(documentLoadResult.Document);
     }
 
     private static IUseCase CreateUseCase(Arguments arguments)
@@ -66,7 +54,7 @@ internal static class Program
                     {
                         case "import":
                         {
-                            Argument file = arguments["file"];
+                            Argument file = arguments["file"] ?? arguments[2];
                             return new ImportAccountUseCase(file?.Value, new ContributionRepository());
                         }
 
@@ -75,6 +63,9 @@ internal static class Program
                             Argument format = arguments["format"];
                             return new ExportAccountUseCase(format?.Value, new ContributionRepository());
                         }
+
+                        case "clear":
+                            return new ClearAccountUseCase(new ContributionRepository());
                     }
 
                 return new ShowAccountUseCase();
@@ -86,55 +77,4 @@ internal static class Program
                 throw new Exception("Unknown command " + noun);
         }
     }
-
-    // private static void DisplayDocument(ContributionsDocument document)
-    // {
-    //     DataGrid dataGrid = new();
-    //
-    //     dataGrid.Columns.Add("Month", HorizontalAlignment.Center);
-    //     dataGrid.Columns.Add("Gross Value", HorizontalAlignment.Right);
-    //     dataGrid.Columns.Add("Administration Fee", HorizontalAlignment.Right);
-    //     dataGrid.Columns.Add("Net Value", HorizontalAlignment.Right);
-    //     dataGrid.Columns.Add("Unit Value", HorizontalAlignment.Right);
-    //     dataGrid.Columns.Add("Unit Count", HorizontalAlignment.Right);
-    //     dataGrid.Columns.Add("Paid in Month", HorizontalAlignment.Center);
-    //
-    //     foreach (Contribution contribution in document)
-    //     {
-    //         dataGrid.Rows.Add(
-    //             contribution.Month,
-    //             contribution.GrossValue,
-    //             contribution.AdministrationFee,
-    //             contribution.NetValue,
-    //             contribution.UnitValue,
-    //             contribution.UnitCount,
-    //             contribution.PaidInMonth);
-    //     }
-    //
-    //     dataGrid.Display();
-    // }
-
-    // private static void DisplayParsingDiagnostics(DocumentParsingDiagnostics diagnostics)
-    // {
-    //     DataGrid diagnosticsGrid = new();
-    //
-    //     diagnosticsGrid.Columns.Add($"Pages ({diagnostics.Pages.Count})");
-    //     diagnosticsGrid.Columns.Add("Use Fallback");
-    //     diagnosticsGrid.Columns.Add("Table Count", HorizontalAlignment.Right);
-    //     diagnosticsGrid.Columns.Add("Row Count", HorizontalAlignment.Right);
-    //
-    //     foreach (PageParsingDiagnostics page in diagnostics.Pages)
-    //     {
-    //         string pageNumber = $"Page {page.PageIndex}";
-    //         YesNoBool usedFallbackExtraction = page.UsedFallbackExtraction;
-    //         int tableCount = page.Tables.Count;
-    //         int rowCount = page.Tables
-    //             .Select(x => x.RowCount)
-    //             .Sum();
-    //
-    //         diagnosticsGrid.Rows.Add(pageNumber, usedFallbackExtraction, tableCount, rowCount);
-    //     }
-    //
-    //     diagnosticsGrid.Display();
-    // }
 }
