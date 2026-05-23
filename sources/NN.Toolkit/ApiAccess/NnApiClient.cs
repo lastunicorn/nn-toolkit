@@ -1,9 +1,9 @@
 using System.Text;
 using System.Text.Json;
 
-namespace DustInTheWind.NN.Toolkit.Cli.Ports.NnAccess;
+namespace DustInTheWind.NN.Toolkit.ApiAccess;
 
-internal sealed class NnApiClient : IDisposable, INnApiClient
+public sealed class NnApiClient : IDisposable, INnApiClient
 {
 	private static readonly JsonSerializerOptions JsonSerializerOptions = new()
 	{
@@ -17,7 +17,7 @@ internal sealed class NnApiClient : IDisposable, INnApiClient
 		http = new HttpClient();
 	}
 
-	public async Task<IEnumerable<NnGraphValue>> GetGraph(DateOnly startDate, DateOnly endDate, int count)
+	public async Task<GraphData> GetGraph(DateOnly startDate, DateOnly endDate, int count)
 	{
 		DateTimeOffset startOffset = new(startDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
 		long startMilliseconds = startOffset.ToUnixTimeMilliseconds();
@@ -26,7 +26,7 @@ internal sealed class NnApiClient : IDisposable, INnApiClient
 		endOffset = endOffset.AddTicks(TimeSpan.TicksPerDay - TimeSpan.TicksPerMillisecond);
 		long endMilliseconds = endOffset.ToUnixTimeMilliseconds();
 
-		GraphApiRequestBody graphApiRequestBody = new()
+		GraphRequestBody graphRequestBody = new()
 		{
 			Bl = "2",
 			NumberOfPoints = count,
@@ -35,32 +35,39 @@ internal sealed class NnApiClient : IDisposable, INnApiClient
 			DateRangeTo = endMilliseconds
 		};
 
-		string requestBody = JsonSerializer.Serialize(graphApiRequestBody, JsonSerializerOptions);
+		string requestBody = JsonSerializer.Serialize(graphRequestBody, JsonSerializerOptions);
 		using StringContent content = new(requestBody, Encoding.UTF8, "application/json");
 		HttpResponseMessage response = await http.PostAsync("https://www.nn.ro/api/graph/post", content);
 		response.EnsureSuccessStatusCode();
 
-		string json = await response.Content.ReadAsStringAsync();
-		using JsonDocument envelope = JsonDocument.Parse(json);
-		using JsonDocument doc = JsonDocument.Parse(envelope.RootElement.GetString()!);
-
-		List<NnGraphValue> fundNavs = [];
+		string jsonEnvelope = await response.Content.ReadAsStringAsync();
+		using JsonDocument envelope = JsonDocument.Parse(jsonEnvelope);
+		
+		string json = envelope.RootElement.GetString();
+		using JsonDocument doc = JsonDocument.Parse(json!);
+		
+		GraphData graphData = new()
+		{
+			Name = doc.RootElement[0].GetProperty("name").GetString()
+		};
 
 		foreach (JsonElement item in doc.RootElement[0].GetProperty("data").EnumerateArray())
 		{
-			string date = DateTimeOffset.FromUnixTimeMilliseconds(item[0].GetInt64()).ToString("yyyy-MM-dd");
-			string value = item[1].GetRawText();
-
-			NnGraphValue nnGraphValue = new()
+			long dateMilliseconds = item[0].GetInt64();
+			DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(dateMilliseconds).DateTime;
+			
+			decimal value = item[1].GetDecimal();
+		
+			NnGraphPoint nnGraphPoint = new()
 			{
-				Date = DateOnly.Parse(date),
-				Value = decimal.Parse(value)
+				Date = dateTime,
+				Value = value
 			};
-
-			fundNavs.Add(nnGraphValue);
+		
+			graphData.Points.Add(nnGraphPoint);
 		}
-
-		return fundNavs;
+		
+		return graphData;
 	}
 
 	public void Dispose()

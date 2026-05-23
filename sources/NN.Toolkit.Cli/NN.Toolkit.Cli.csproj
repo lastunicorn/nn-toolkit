@@ -23,4 +23,8 @@
         <InternalsVisibleTo Include="NN.Toolkit.Cli.Tests"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Ports\NnAccess\" />
+    </ItemGroup>
+
 </Project>

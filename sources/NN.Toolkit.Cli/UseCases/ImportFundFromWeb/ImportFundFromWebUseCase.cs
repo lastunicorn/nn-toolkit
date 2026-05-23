@@ -1,11 +1,9 @@
-using System.Text;
-using System.Text.Json;
 using DustInTheWind.ConsoleTools;
 using DustInTheWind.ConsoleTools.Controls;
 using DustInTheWind.ConsoleTools.Controls.Tables;
+using DustInTheWind.NN.Toolkit.ApiAccess;
 using DustInTheWind.NN.Toolkit.Cli.Domain;
 using DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
-using DustInTheWind.NN.Toolkit.Cli.Ports.NnAccess;
 
 namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromWeb;
 
@@ -53,9 +51,9 @@ internal class ImportFundFromWebUseCase : IUseCase
 
 		int numberOfPoints = toDate.DayNumber - fromDate.DayNumber + 1;
 
-		IEnumerable<NnGraphValue> values = await nnApiClient.GetGraph(fromDate, toDate, numberOfPoints);
+		GraphData graphData = await nnApiClient.GetGraph(fromDate, toDate, numberOfPoints);
 
-		return values
+		return graphData.Points
 			.Select(x => new FundNav
 			{
 				Date = x.Date,
@@ -63,52 +61,6 @@ internal class ImportFundFromWebUseCase : IUseCase
 			})
 			.ToList();
 	}
-
-	// private async Task<IEnumerable<FundNav>> ReadFromNnApi()
-	// {
-	// 	long dateRangeFrom = new DateTimeOffset(Year.Value, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
-	// 	long dateRangeTo = new DateTimeOffset(Year.Value, 12, 31, 23, 59, 59, TimeSpan.Zero).ToUnixTimeMilliseconds();
-	//
-	// 	int numberOfPoints = DateTime.IsLeapYear(Year.Value) ? 366 : 365;
-	//
-	// 	GraphApiRequestBody graphApiRequestBody = new()
-	// 	{
-	// 		Bl = "2",
-	// 		NumberOfPoints = numberOfPoints,
-	// 		Currency = "LEI",
-	// 		DateRangeFrom = dateRangeFrom,
-	// 		DateRangeTo = dateRangeTo
-	// 	};
-	//
-	// 	using HttpClient http = new HttpClient();
-	//
-	// 	string requestBody = JsonSerializer.Serialize(graphApiRequestBody, JsonSerializerOptions);
-	// 	using StringContent content = new(requestBody, Encoding.UTF8, "application/json");
-	// 	HttpResponseMessage response = await http.PostAsync("https://www.nn.ro/api/graph/post", content);
-	// 	response.EnsureSuccessStatusCode();
-	//
-	// 	string json = await response.Content.ReadAsStringAsync();
-	// 	using JsonDocument envelope = JsonDocument.Parse(json);
-	// 	using JsonDocument doc = JsonDocument.Parse(envelope.RootElement.GetString()!);
-	//
-	// 	List<FundNav> fundNavs = [];
-	//
-	// 	foreach (JsonElement item in doc.RootElement[0].GetProperty("data").EnumerateArray())
-	// 	{
-	// 		string date = DateTimeOffset.FromUnixTimeMilliseconds(item[0].GetInt64()).ToString("yyyy-MM-dd");
-	// 		string value = item[1].GetRawText();
-	//
-	// 		FundNav fundNav = new()
-	// 		{
-	// 			Date = DateOnly.Parse(date),
-	// 			Value = decimal.Parse(value)
-	// 		};
-	//
-	// 		fundNavs.Add(fundNav);
-	// 	}
-	//
-	// 	return fundNavs;
-	// }
 
 	private ImportDiagnostics Import(IEnumerable<FundNav> fundNavs)
 	{

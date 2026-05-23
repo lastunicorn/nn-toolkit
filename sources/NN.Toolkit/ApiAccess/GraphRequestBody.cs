@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace DustInTheWind.NN.Toolkit.Cli.Ports.NnAccess;
+namespace DustInTheWind.NN.Toolkit.ApiAccess;
 
-internal class GraphApiRequestBody
+internal class GraphRequestBody
 {
 	[JsonPropertyName("bl")]
 	public string Bl { get; set; }

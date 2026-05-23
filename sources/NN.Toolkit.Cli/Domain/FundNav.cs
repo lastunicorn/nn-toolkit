@@ -5,7 +5,7 @@ namespace DustInTheWind.NN.Toolkit.Cli.Domain;
 /// </summary>
 public record FundNav
 {
-    public DateOnly Date { get; set; }
+	public DateTime Date { get; set; }
 
-    public decimal Value { get; set; }
+	public decimal Value { get; set; }
 }

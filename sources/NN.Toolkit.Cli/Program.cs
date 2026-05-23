@@ -1,7 +1,7 @@
 ﻿using DustInTheWind.ConsoleTools.Arguments;
+using DustInTheWind.NN.Toolkit.ApiAccess;
 using DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.Ports.FileSystemAccess;
-using DustInTheWind.NN.Toolkit.Cli.Ports.NnAccess;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearFund;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
