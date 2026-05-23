@@ -10,7 +10,8 @@ public class ContributionRepository
 
     private readonly JsonSerializerOptions jsonSerializerOptions = new()
     {
-        WriteIndented = true
+        WriteIndented = true,
+        Converters = { new MonthDateJsonConverter() }
     };
 
     private List<Contribution> contributions = [];
@@ -50,7 +51,7 @@ public class ContributionRepository
             return;
 
         string json = File.ReadAllText(filePath);
-        contributions = JsonSerializer.Deserialize<List<Contribution>>(json) ?? [];
+        contributions = JsonSerializer.Deserialize<List<Contribution>>(json, jsonSerializerOptions) ?? [];
     }
 
     private void SaveContributions()

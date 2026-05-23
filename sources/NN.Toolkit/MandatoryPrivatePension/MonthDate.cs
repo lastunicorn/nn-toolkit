@@ -1,6 +1,6 @@
 ﻿namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
-public record struct MonthDate
+public readonly record struct MonthDate
 {
     public int Year { get; private init; }
 
@@ -23,9 +23,9 @@ public record struct MonthDate
         return $"{Month:00}/{Year}";
     }
 
-    public static MonthDate Parse(string monthDate)
+    public static MonthDate Parse(string text)
     {
-        string[] parts = monthDate.Split('/');
+        string[] parts = text.Split('/');
 
         return new MonthDate
         {

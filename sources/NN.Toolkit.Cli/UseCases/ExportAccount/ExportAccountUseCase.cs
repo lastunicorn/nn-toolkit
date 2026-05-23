@@ -2,7 +2,7 @@ using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.Export;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
-namespace DustInTheWind.NN.Toolkit.Cli.UseCases;
+namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
 
 internal class ExportAccountUseCase : IUseCase
 {

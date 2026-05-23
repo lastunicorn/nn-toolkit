@@ -31,13 +31,7 @@ internal class ImportAccountUseCase : IUseCase
     private DocumentLoadResult ParseDocument(string filePath)
     {
         Console.WriteLine($"Parsing document '{filePath}'");
-
-        DocumentLoadResult documentLoadResult = ContributionsDocument.LoadFromFile(filePath);
-
-        foreach (Contribution contribution in documentLoadResult.Document)
-            contributionRepository.Add(contribution);
-
-        return documentLoadResult;
+        return ContributionsDocument.LoadFromFile(filePath);
     }
 
     private static void DisplayParsingDiagnostics(DocumentParsingDiagnostics diagnostics)
