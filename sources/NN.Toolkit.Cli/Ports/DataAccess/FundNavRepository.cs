@@ -11,6 +11,11 @@ public class FundNavRepository
         this.database = database ?? throw new ArgumentNullException(nameof(database));
     }
 
+    public FundNav Get(DateOnly date)
+    {
+        return database.FundRecords.FirstOrDefault(x => x.Date == date);
+    }
+
     public IEnumerable<FundNav> GetAll()
     {
         return database.FundRecords;

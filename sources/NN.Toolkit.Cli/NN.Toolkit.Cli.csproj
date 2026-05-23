@@ -9,13 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NN.Toolkit\NN.Toolkit.csproj"/>
+        <ProjectReference Include="..\NN.Toolkit\NN.Toolkit.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="ConsoleTools.Arguments" Version="1.0.0"/>
-        <PackageReference Include="ConsoleTools.Controls.Tables" Version="1.2.1"/>
-        <PackageReference Include="Tabula" Version="1.0.1"/>
+        <PackageReference Include="ConsoleTools.Arguments" Version="1.0.0" />
+        <PackageReference Include="ConsoleTools.Controls.Tables" Version="1.2.1" />
+        <PackageReference Include="CsvHelper" Version="33.1.0" />
+        <PackageReference Include="Tabula" Version="1.0.1" />
     </ItemGroup>
 
 </Project>

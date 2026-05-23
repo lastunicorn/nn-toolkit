@@ -1,10 +1,13 @@
 ﻿using DustInTheWind.ConsoleTools.Arguments;
 using DustInTheWind.NN.Toolkit.Cli.DataAccess;
+using DustInTheWind.NN.Toolkit.Cli.Ports.FileSystemAccess;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearFund;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.Help;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportAccount;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromFile;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromWeb;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ShowAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ShowFund;
 
@@ -55,10 +58,10 @@ internal static class Program
     private static IUseCase HandleAccountCommand(Arguments arguments)
     {
         Argument verb = arguments[1];
-                
-        if(verb == null)
+
+        if (verb == null)
             return new ShowAccountUseCase(new UnitOfWork(new Database()));
-                
+
         switch (verb.Type)
         {
             case ArgumentType.Ordinal:
@@ -79,8 +82,9 @@ internal static class Program
                     case "clear":
                         return new ClearAccountUseCase(new UnitOfWork(new Database()));
                 }
+
                 break;
-                    
+
             case ArgumentType.Named:
                 return new ShowAccountUseCase(new UnitOfWork(new Database()));
         }
@@ -91,10 +95,10 @@ internal static class Program
     private static IUseCase HandleFundCommand(Arguments arguments)
     {
         Argument verb = arguments[1];
-                
-        if(verb == null)
+
+        if (verb == null)
             return new ShowFundUseCase(new UnitOfWork(new Database()));
-                
+
         switch (verb.Type)
         {
             case ArgumentType.Ordinal:
@@ -102,11 +106,37 @@ internal static class Program
                 {
                     case "import":
                     {
-                        throw new NotImplementedException();
-                        // Argument from = arguments["from"];
-                        // Argument to = arguments["to"];
-                        // Argument year = arguments["year"];
-                        // return new ImportAccountUseCase(file?.Value, new UnitOfWork(new Database()));
+                        Argument fileArgument = arguments["file"];
+
+                        if (fileArgument != null)
+                        {
+                            UnitOfWork unitOfWork = new(new Database());
+                            FileSystemService fileSystemService = new();
+                            return new ImportFundFromFileUseCase(fileArgument.Value, unitOfWork, fileSystemService);
+                        }
+
+                        Argument fromArgument = arguments["from"];
+                        Argument toArgument = arguments["to"];
+                        Argument yearArgument = arguments["year"];
+
+                        if (fromArgument != null || toArgument != null || yearArgument != null)
+                        {
+                            DateOnly? from = fromArgument != null
+                                ? DateOnly.Parse(fromArgument.Value)
+                                : null;
+
+                            DateOnly? to = toArgument != null
+                                ? DateOnly.Parse(toArgument.Value)
+                                : null;
+
+                            uint? year = yearArgument != null
+                                ? uint.Parse(yearArgument.Value)
+                                : null;
+
+                            return new ImportFundFromWebUseCase(from, to, year, new UnitOfWork(new Database()));
+                        }
+                        
+                        throw new Exception("Unknown command: fund " + verb.Value);
                     }
 
                     case "export":
@@ -119,8 +149,9 @@ internal static class Program
                     case "clear":
                         return new ClearFundUseCase(new UnitOfWork(new Database()));
                 }
+
                 break;
-                    
+
             case ArgumentType.Named:
                 return new ShowFundUseCase(new UnitOfWork(new Database()));
         }
