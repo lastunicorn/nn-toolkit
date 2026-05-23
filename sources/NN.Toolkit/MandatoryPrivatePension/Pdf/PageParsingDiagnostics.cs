@@ -4,7 +4,7 @@ public class PageParsingDiagnostics
 {
     public int PageIndex { get; }
 
-    public bool UsedFallbackExtraction { get; set; }
+    public TableExtractionApproach TableExtractionApproach { get; set; }
 
     public List<TableParsingDiagnostics> Tables { get; } = [];
 

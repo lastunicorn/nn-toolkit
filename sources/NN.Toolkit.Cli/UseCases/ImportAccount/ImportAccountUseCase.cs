@@ -4,7 +4,7 @@ using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
-namespace DustInTheWind.NN.Toolkit.Cli.UseCases;
+namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ImportAccount;
 
 internal class ImportAccountUseCase : IUseCase
 {
@@ -19,12 +19,13 @@ internal class ImportAccountUseCase : IUseCase
 
     public void Execute()
     {
-        string filePath = this.filePath ?? "contributions.pdf";
+        string filePathSafe = filePath ?? "contributions.pdf";
 
-        DocumentLoadResult documentLoadResult = ParseDocument(filePath);
+        DocumentLoadResult documentLoadResult = ParseDocument(filePathSafe);
         DisplayParsingDiagnostics(documentLoadResult.Diagnostics);
 
-        Import(documentLoadResult.Document);
+        ImportDiagnostics importDiagnostics = Import(documentLoadResult.Document);
+        DisplayImportDiagnostics(importDiagnostics);
     }
 
     private DocumentLoadResult ParseDocument(string filePath)
@@ -47,20 +48,20 @@ internal class ImportAccountUseCase : IUseCase
         };
 
         diagnosticsGrid.Columns.Add($"Pages ({diagnostics.Pages.Count})");
-        diagnosticsGrid.Columns.Add("Use Fallback");
+        diagnosticsGrid.Columns.Add("Extraction Algorithm");
         diagnosticsGrid.Columns.Add("Table Count", HorizontalAlignment.Right);
         diagnosticsGrid.Columns.Add("Row Count", HorizontalAlignment.Right);
 
         foreach (PageParsingDiagnostics page in diagnostics.Pages)
         {
             string pageNumber = $"Page {page.PageIndex}";
-            YesNoBool usedFallbackExtraction = page.UsedFallbackExtraction;
+            TableExtractionApproachPretty tableExtractionApproach = page.TableExtractionApproach;
             int tableCount = page.Tables.Count;
             int rowCount = page.Tables
                 .Select(x => x.RowCount)
                 .Sum();
 
-            diagnosticsGrid.Rows.Add(pageNumber, usedFallbackExtraction, tableCount, rowCount);
+            diagnosticsGrid.Rows.Add(pageNumber, tableExtractionApproach, tableCount, rowCount);
         }
 
         int totalRowCount = diagnostics.Pages
@@ -72,7 +73,7 @@ internal class ImportAccountUseCase : IUseCase
         diagnosticsGrid.Display();
     }
 
-    private void Import(ContributionsDocument contributionsDocument)
+    private ImportDiagnostics Import(ContributionsDocument contributionsDocument)
     {
         Console.WriteLine($"Importing {contributionsDocument.Count} contributions into database.");
 
@@ -111,14 +112,24 @@ internal class ImportAccountUseCase : IUseCase
 
         Console.WriteLine();
         Console.WriteLine("Data imported successfully.");
+
+        return importDiagnostics;
     }
-}
 
-internal class ImportDiagnostics
-{
-    public int AddCount { get; set; }
+    private void DisplayImportDiagnostics(ImportDiagnostics importDiagnostics)
+    {
+        DataGrid diagnosticsGrid = new()
+        {
+            Margin = new Thickness(0, 1, 0, 1)
+        };
 
-    public int UpdateCount { get; set; }
+        diagnosticsGrid.Columns.Add("Name", HorizontalAlignment.Left);
+        diagnosticsGrid.Columns.Add("Value", HorizontalAlignment.Right);
 
-    public int SkipCount { get; set; }
+        diagnosticsGrid.Rows.Add("Add", importDiagnostics.AddCount);
+        diagnosticsGrid.Rows.Add("Update", importDiagnostics.UpdateCount);
+        diagnosticsGrid.Rows.Add("Skip", importDiagnostics.SkipCount);
+
+        diagnosticsGrid.Display();
+    }
 }

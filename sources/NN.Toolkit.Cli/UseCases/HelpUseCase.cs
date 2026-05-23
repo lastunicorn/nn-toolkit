@@ -1,4 +1,4 @@
-using DustInTheWind.NN.Toolkit.Cli;
+namespace DustInTheWind.NN.Toolkit.Cli.UseCases;
 
 public class HelpUseCase : IUseCase
 {

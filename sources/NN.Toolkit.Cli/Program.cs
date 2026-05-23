@@ -4,6 +4,7 @@ using DustInTheWind.ConsoleTools.Controls.Tables;
 using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.Export;
 using DustInTheWind.NN.Toolkit.Cli.UseCases;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportAccount;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
@@ -59,11 +60,21 @@ internal static class Program
 
             case "account":
                 Argument verb = arguments[1];
-                if (verb is { Type: ArgumentType.Ordinal, Value: "import" })
-                {
-                    Argument file = arguments["file"];
-                    return new ImportAccountUseCase(file?.Value, new ContributionRepository());
-                }
+                if (verb?.Type == ArgumentType.Ordinal)
+                    switch (verb.Value)
+                    {
+                        case "import":
+                        {
+                            Argument file = arguments["file"];
+                            return new ImportAccountUseCase(file?.Value, new ContributionRepository());
+                        }
+
+                        case "export":
+                        {
+                            Argument format = arguments["format"];
+                            return new ExportAccountUseCase(format?.Value, new ContributionRepository());
+                        }
+                    }
 
                 return new ShowAccountUseCase();
 
@@ -125,21 +136,4 @@ internal static class Program
     //
     //     diagnosticsGrid.Display();
     // }
-
-    private static void ExportToCsv(ContributionsDocument document)
-    {
-        using NnTransactionsFile nnTransactionsFile = new("NN_transactions.csv");
-        using NnCashTransactionsFile nnCashTransactionsFile = new("NN_cash_transactions.csv");
-
-        foreach (Contribution contribution in document)
-        {
-            nnTransactionsFile.Write(contribution, document.Header);
-            nnCashTransactionsFile.Write(contribution);
-        }
-
-        Console.WriteLine();
-        Console.WriteLine("Pdf was exported to CSV files:");
-        Console.WriteLine("  - NN_transactions.csv");
-        Console.WriteLine("  - NN_cash_transactions.csv");
-    }
 }

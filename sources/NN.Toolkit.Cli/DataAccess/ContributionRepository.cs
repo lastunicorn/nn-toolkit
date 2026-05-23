@@ -5,8 +5,14 @@ namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
 
 public class ContributionRepository
 {
-    private readonly string databasePath = "Data";
-    private readonly string fileName = "contributions.json";
+    private const string DatabasePath = "Data";
+    private const string FileName = "contributions.json";
+
+    private readonly JsonSerializerOptions jsonSerializerOptions = new()
+    {
+        WriteIndented = true
+    };
+
     private List<Contribution> contributions = [];
 
     public ContributionRepository()
@@ -38,7 +44,7 @@ public class ContributionRepository
 
     private void LoadContributions()
     {
-        string filePath = Path.Combine(databasePath, fileName);
+        string filePath = Path.Combine(DatabasePath, FileName);
 
         if (!File.Exists(filePath))
             return;
@@ -49,11 +55,10 @@ public class ContributionRepository
 
     private void SaveContributions()
     {
-        if (!Directory.Exists(databasePath))
-            Directory.CreateDirectory(databasePath);
+        if (!Directory.Exists(DatabasePath))
+            Directory.CreateDirectory(DatabasePath);
 
-        string filePath = Path.Combine(databasePath, fileName);
-        JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
+        string filePath = Path.Combine(DatabasePath, FileName);
         string json = JsonSerializer.Serialize(contributions, jsonSerializerOptions);
         File.WriteAllText(filePath, json);
     }
