@@ -7,7 +7,7 @@ public class Database
 {
     public List<Contribution> Contributions { get; } = [];
 
-    public List<FundRecord> FundRecords { get; } = [];
+    public List<FundNav> FundRecords { get; } = [];
 
     public Database()
     {

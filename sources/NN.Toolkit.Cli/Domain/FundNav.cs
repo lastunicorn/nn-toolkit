@@ -1,6 +1,9 @@
 namespace DustInTheWind.NN.Toolkit.Cli.Domain;
 
-public class FundRecord
+/// <summary>
+/// Fund Net Asset Value
+/// </summary>
+public record FundNav
 {
     public DateOnly Date { get; set; }
 

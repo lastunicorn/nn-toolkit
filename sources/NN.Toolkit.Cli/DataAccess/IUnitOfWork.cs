@@ -4,7 +4,7 @@ internal interface IUnitOfWork
 {
     ContributionRepository ContributionRepository { get; }
 
-    FundRecordRepository FundRecordRepository { get; }
+    FundNavRepository FundNavRepository { get; }
 
     void SaveChanges();
 }

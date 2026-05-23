@@ -1,6 +1,7 @@
 ﻿using DustInTheWind.ConsoleTools.Arguments;
 using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearAccount;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearFund;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.Help;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportAccount;
@@ -89,6 +90,41 @@ internal static class Program
 
     private static IUseCase HandleFundCommand(Arguments arguments)
     {
-        return new ShowFundUseCase(new UnitOfWork(new Database()));
+        Argument verb = arguments[1];
+                
+        if(verb == null)
+            return new ShowFundUseCase(new UnitOfWork(new Database()));
+                
+        switch (verb.Type)
+        {
+            case ArgumentType.Ordinal:
+                switch (verb.Value)
+                {
+                    case "import":
+                    {
+                        throw new NotImplementedException();
+                        // Argument from = arguments["from"];
+                        // Argument to = arguments["to"];
+                        // Argument year = arguments["year"];
+                        // return new ImportAccountUseCase(file?.Value, new UnitOfWork(new Database()));
+                    }
+
+                    case "export":
+                    {
+                        throw new NotImplementedException();
+                        // Argument format = arguments["format"];
+                        // return new ExportAccountUseCase(format?.Value, new UnitOfWork(new Database()));
+                    }
+
+                    case "clear":
+                        return new ClearFundUseCase(new UnitOfWork(new Database()));
+                }
+                break;
+                    
+            case ArgumentType.Named:
+                return new ShowFundUseCase(new UnitOfWork(new Database()));
+        }
+
+        throw new Exception("Unknown command: fund " + verb.Value);
     }
 }

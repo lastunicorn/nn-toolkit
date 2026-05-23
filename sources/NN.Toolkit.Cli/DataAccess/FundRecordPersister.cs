@@ -3,17 +3,17 @@ using DustInTheWind.NN.Toolkit.Cli.Domain;
 
 namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
 
-public class FundRecordPersister : IEntityPersister<FundRecord>
+public class FundRecordPersister : IEntityPersister<FundNav>
 {
     private const string DatabasePath = "Data";
-    private const string FileName = "fund-records.json";
+    private const string FileName = "fund-navs.json";
 
     private readonly JsonSerializerOptions jsonSerializerOptions = new()
     {
         WriteIndented = true
     };
 
-    public IEnumerable<FundRecord> Load()
+    public IEnumerable<FundNav> Load()
     {
         string filePath = Path.Combine(DatabasePath, FileName);
 
@@ -21,10 +21,10 @@ public class FundRecordPersister : IEntityPersister<FundRecord>
             return [];
 
         string json = File.ReadAllText(filePath);
-        return JsonSerializer.Deserialize<List<FundRecord>>(json, jsonSerializerOptions) ?? [];
+        return JsonSerializer.Deserialize<List<FundNav>>(json, jsonSerializerOptions) ?? [];
     }
 
-    public void Save(IEnumerable<FundRecord> fundRecords)
+    public void Save(IEnumerable<FundNav> fundRecords)
     {
         if (!Directory.Exists(DatabasePath))
             Directory.CreateDirectory(DatabasePath);

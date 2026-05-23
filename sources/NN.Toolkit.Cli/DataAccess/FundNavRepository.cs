@@ -2,25 +2,25 @@ using DustInTheWind.NN.Toolkit.Cli.Domain;
 
 namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
 
-public class FundRecordRepository
+public class FundNavRepository
 {
     private readonly Database database;
 
-    public FundRecordRepository(Database database)
+    public FundNavRepository(Database database)
     {
         this.database = database ?? throw new ArgumentNullException(nameof(database));
     }
 
-    public IEnumerable<FundRecord> GetAll()
+    public IEnumerable<FundNav> GetAll()
     {
         return database.FundRecords;
     }
 
-    public void Add(FundRecord fundRecord)
+    public void Add(FundNav fundNav)
     {
-        if (fundRecord == null) throw new ArgumentNullException(nameof(fundRecord));
+        if (fundNav == null) throw new ArgumentNullException(nameof(fundNav));
 
-        database.FundRecords.Add(fundRecord);
+        database.FundRecords.Add(fundNav);
     }
 
     public void Clear()

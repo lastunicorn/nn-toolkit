@@ -3,12 +3,10 @@ namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
 internal class UnitOfWork: IUnitOfWork
 {
     private readonly Database database;
-    private ContributionRepository contributionRepository;
-    private FundRecordRepository fundRecordRepository;
-    
-    public ContributionRepository ContributionRepository => contributionRepository ??= new ContributionRepository(database);
 
-    public FundRecordRepository FundRecordRepository => fundRecordRepository ??= new FundRecordRepository(database);
+    public ContributionRepository ContributionRepository => field ??= new ContributionRepository(database);
+
+    public FundNavRepository FundNavRepository => field ??= new FundNavRepository(database);
 
     public UnitOfWork(Database database)
     {

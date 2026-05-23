@@ -16,19 +16,19 @@ internal class ShowFundUseCase : IUseCase
 
     public void Execute()
     {
-        IEnumerable<FundRecord> fundRecords = unitOfWork.FundRecordRepository.GetAll();
+        IEnumerable<FundNav> fundRecords = unitOfWork.FundNavRepository.GetAll();
 
         DisplayFundRecords(fundRecords);
     }
 
-    private void DisplayFundRecords(IEnumerable<FundRecord> fundRecords)
+    private void DisplayFundRecords(IEnumerable<FundNav> fundRecords)
     {
         DataGrid dataGrid = new();
 
         dataGrid.Columns.Add("Date", HorizontalAlignment.Center);
         dataGrid.Columns.Add("Value", HorizontalAlignment.Right);
 
-        foreach (FundRecord fundRecord in fundRecords)
+        foreach (FundNav fundRecord in fundRecords)
         {
             dataGrid.Rows.Add(
                 fundRecord.Date,
