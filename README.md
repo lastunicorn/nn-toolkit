@@ -1,7 +1,7 @@
-
 # NN Toolkit
 
-`NN Toolkit` is a .NET library for working with files exported from NN (Nationale-Nederlanden), currently focused on parsing PDF contribution statements for the Romanian Mandatory Private Pension (Pilon II).
+`NN Toolkit` is a .NET library for working with files exported from NN (Nationale-Nederlanden), currently focused on
+parsing PDF contribution statements for the Romanian Mandatory Private Pension (Pilon II).
 
 NN Group reference:
 
@@ -73,7 +73,7 @@ foreach (Contribution contribution in document)
 Each row is mapped to:
 
 - `Month` (`MonthDate`)
-  - expects date in the `MM/YYYY` style.
+    - expects date in the `MM/YYYY` style.
 
 - `GrossValue` (`decimal`)
 - `AdministrationFee` (`decimal`)
@@ -81,12 +81,12 @@ Each row is mapped to:
 - `UnitValue` (`decimal`)
 - `UnitCount` (`decimal`)
 - `PaidInMonth` (`MonthDate`)
-  - expects date in the `MM/YYYY` style.
-
+    - expects date in the `MM/YYYY` style.
 
 ## Parsing Diagnostics
 
-When a document is parsed using `ContributionsDocument.LoadFromFile()`, both the parsed data and parsing diagnostics are returned.
+When a document is parsed using `ContributionsDocument.LoadFromFile()`, both the parsed data and parsing diagnostics are
+returned.
 
 ```csharp
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;

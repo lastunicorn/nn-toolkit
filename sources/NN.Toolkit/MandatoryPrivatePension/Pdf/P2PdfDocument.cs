@@ -8,7 +8,7 @@ internal sealed class P2PdfDocument : IDisposable
     private readonly string filePath;
     private PdfDocument pdfDocument;
     private bool isDisposed;
-    
+
     public DocumentParsingDiagnostics ParsingDiagnostics { get; private set; }
 
     public P2PdfDocument(string filePath)

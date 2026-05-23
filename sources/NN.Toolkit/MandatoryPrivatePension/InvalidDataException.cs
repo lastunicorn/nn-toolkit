@@ -6,9 +6,9 @@ public class InvalidDataException : Exception
         : base($"Data could not be parsed: {value}. The entire row: {string.Join(" | ", values)}")
     {
     }
-    
+
     public InvalidDataException(string value, IEnumerable<string> values, Exception innerException)
-        : base($"Data could not be parsed: {value}. The entire row: {string.Join(" | ", values)}",  innerException)
+        : base($"Data could not be parsed: {value}. The entire row: {string.Join(" | ", values)}", innerException)
     {
     }
 }

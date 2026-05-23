@@ -16,8 +16,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="$(MSBuildThisFileDirectory)..\LICENSE" Pack="true" PackagePath="" Link="LICENSE" />
-        <None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="" Link="README.md" />
+        <None Include="$(MSBuildThisFileDirectory)..\LICENSE" Pack="true" PackagePath="" Link="LICENSE"/>
+        <None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="" Link="README.md"/>
     </ItemGroup>
 
 </Project>

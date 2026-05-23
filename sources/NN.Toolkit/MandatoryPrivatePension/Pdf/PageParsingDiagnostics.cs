@@ -5,12 +5,12 @@ public class PageParsingDiagnostics
     public int PageIndex { get; }
 
     public bool UsedFallbackExtraction { get; set; }
-    
+
     public List<TableParsingDiagnostics> Tables { get; } = [];
 
     public Exception Error { get; set; }
-    
-    public bool HasErrors => Error != null ||  Tables.Any(x => x.HasErrors);
+
+    public bool HasErrors => Error != null || Tables.Any(x => x.HasErrors);
 
     public PageParsingDiagnostics(int pageIndex)
     {

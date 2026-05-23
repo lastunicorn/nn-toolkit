@@ -5,7 +5,7 @@ namespace DustInTheWind.NN.Toolkit.Cli.Export;
 internal sealed class NnTransactionsFile : IDisposable, IAsyncDisposable
 {
     private readonly StreamWriter output;
-    
+
     public NnTransactionsFile(string filePath)
     {
         output = new StreamWriter(filePath);

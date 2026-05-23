@@ -24,7 +24,7 @@ internal class P2PdfPage
         IExtractionAlgorithm algorithm = new BasicExtractionAlgorithm();
 
         IReadOnlyList<TableRectangle> regions = detector.Detect(pageArea);
-        
+
         if (regions.Count == 0)
         {
             UsedFallbackExtraction = true;

@@ -1,20 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<AssemblyName>DustInTheWind.$(MSBuildProjectName)</AssemblyName>
-		<RootNamespace>DustInTheWind.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-	</PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AssemblyName>DustInTheWind.$(MSBuildProjectName)</AssemblyName>
+        <RootNamespace>DustInTheWind.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\NN.Toolkit\NN.Toolkit.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\NN.Toolkit\NN.Toolkit.csproj"/>
+    </ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="ConsoleTools.Controls.Tables" Version="1.2.1" />
-	  <PackageReference Include="Tabula" Version="1.0.1" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ConsoleTools.Arguments" Version="1.0.0"/>
+        <PackageReference Include="ConsoleTools.Controls.Tables" Version="1.2.1"/>
+        <PackageReference Include="Tabula" Version="1.0.1"/>
+    </ItemGroup>
 
 </Project>

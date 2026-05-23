@@ -1,6 +1,9 @@
-﻿using DustInTheWind.ConsoleTools.Controls;
+﻿using DustInTheWind.ConsoleTools.Arguments;
+using DustInTheWind.ConsoleTools.Controls;
 using DustInTheWind.ConsoleTools.Controls.Tables;
+using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.Export;
+using DustInTheWind.NN.Toolkit.Cli.UseCases;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
@@ -8,70 +11,120 @@ namespace DustInTheWind.NN.Toolkit.Cli;
 
 internal static class Program
 {
+    // account import "contributions.pdf"
+    // account import --file "contributions.pdf"
+    // account clear
+    // account export --format pp
+    // account
+
+    // fund import --from 2026-01-01 --to 2026-12-31
+    // fund import --year 2026
+    // fund import --file "historical_2008.csv"
+    // fund clear
+    // fund
+
+    // help
+
     internal static void Main(string[] args)
     {
-        string inputPdfPath = args.FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(inputPdfPath))
-            inputPdfPath = "contributions.pdf";
+        Arguments arguments = new(args);
 
-        DocumentLoadResult documentLoadResult = ContributionsDocument.LoadFromFile(inputPdfPath);
+        IUseCase useCase = CreateUseCase(arguments) ?? new HelpUseCase();
+        useCase.Execute();
 
-        DisplayDocument(documentLoadResult.Document);
-        DisplayParsingDiagnostics(documentLoadResult.Diagnostics);
-        
-        ExportToCsv(documentLoadResult.Document);
+        // if (string.IsNullOrWhiteSpace(noun))
+        //     noun = "contributions.pdf";
+        //
+        // DocumentLoadResult documentLoadResult = ContributionsDocument.LoadFromFile(noun);
+        //
+        // DisplayDocument(documentLoadResult.Document);
+        // DisplayParsingDiagnostics(documentLoadResult.Diagnostics);
+        //
+        // ExportToCsv(documentLoadResult.Document);
     }
 
-    private static void DisplayDocument(ContributionsDocument document)
+    private static IUseCase CreateUseCase(Arguments arguments)
     {
-        DataGrid dataGrid = new();
+        if (arguments.Count == 0)
+            return null;
 
-        dataGrid.Columns.Add("Month");
-        dataGrid.Columns.Add("Gross Value");
-        dataGrid.Columns.Add("Administration Fee");
-        dataGrid.Columns.Add("Net Value");
-        dataGrid.Columns.Add("Unit Value");
-        dataGrid.Columns.Add("Unit Count");
-        dataGrid.Columns.Add("Paid in Month");
+        Argument noun = arguments[1];
+        if (noun.Type != ArgumentType.Ordinal)
+            return null;
 
-        foreach (Contribution contribution in document)
+        switch (noun.Value)
         {
-            dataGrid.Rows.Add(
-                contribution.Month,
-                contribution.GrossValue,
-                contribution.AdministrationFee,
-                contribution.NetValue,
-                contribution.UnitValue,
-                contribution.UnitCount,
-                contribution.PaidInMonth);
-        }
+            case "help":
+                return new HelpUseCase();
 
-        dataGrid.Display();
+            case "account":
+                Argument verb = arguments[2];
+                if (verb.Type == ArgumentType.Ordinal && verb.Value == "import")
+                {
+                    Argument file = arguments["file"];
+                    return new ImportAccountUseCase(file.Value, new ContributionRepository());
+                }
+
+                return new ShowAccountUseCase();
+
+            case "fund":
+                return new ShowFundUseCase();
+
+            default:
+                throw new Exception("Unknown command " + noun);
+        }
     }
 
-    private static void DisplayParsingDiagnostics(DocumentParsingDiagnostics diagnostics)
-    {
-        DataGrid diagnosticsGrid = new();
+    // private static void DisplayDocument(ContributionsDocument document)
+    // {
+    //     DataGrid dataGrid = new();
+    //
+    //     dataGrid.Columns.Add("Month", HorizontalAlignment.Center);
+    //     dataGrid.Columns.Add("Gross Value", HorizontalAlignment.Right);
+    //     dataGrid.Columns.Add("Administration Fee", HorizontalAlignment.Right);
+    //     dataGrid.Columns.Add("Net Value", HorizontalAlignment.Right);
+    //     dataGrid.Columns.Add("Unit Value", HorizontalAlignment.Right);
+    //     dataGrid.Columns.Add("Unit Count", HorizontalAlignment.Right);
+    //     dataGrid.Columns.Add("Paid in Month", HorizontalAlignment.Center);
+    //
+    //     foreach (Contribution contribution in document)
+    //     {
+    //         dataGrid.Rows.Add(
+    //             contribution.Month,
+    //             contribution.GrossValue,
+    //             contribution.AdministrationFee,
+    //             contribution.NetValue,
+    //             contribution.UnitValue,
+    //             contribution.UnitCount,
+    //             contribution.PaidInMonth);
+    //     }
+    //
+    //     dataGrid.Display();
+    // }
 
-        diagnosticsGrid.Columns.Add($"Pages ({diagnostics.Pages.Count})");
-        diagnosticsGrid.Columns.Add("Use Fallback");
-        diagnosticsGrid.Columns.Add("Table Count", HorizontalAlignment.Right);
-        diagnosticsGrid.Columns.Add("Row Count", HorizontalAlignment.Right);
-
-        foreach (PageParsingDiagnostics page in diagnostics.Pages)
-        {
-            string pageNumber = $"Page {page.PageIndex}";
-            YesNoBool usedFallbackExtraction = page.UsedFallbackExtraction;
-            int tableCount = page.Tables.Count;
-            int rowCount = page.Tables
-                .Select(x => x.RowCount)
-                .Sum();
-
-            diagnosticsGrid.Rows.Add(pageNumber, usedFallbackExtraction, tableCount, rowCount);
-        }
-
-        diagnosticsGrid.Display();
-    }
+    // private static void DisplayParsingDiagnostics(DocumentParsingDiagnostics diagnostics)
+    // {
+    //     DataGrid diagnosticsGrid = new();
+    //
+    //     diagnosticsGrid.Columns.Add($"Pages ({diagnostics.Pages.Count})");
+    //     diagnosticsGrid.Columns.Add("Use Fallback");
+    //     diagnosticsGrid.Columns.Add("Table Count", HorizontalAlignment.Right);
+    //     diagnosticsGrid.Columns.Add("Row Count", HorizontalAlignment.Right);
+    //
+    //     foreach (PageParsingDiagnostics page in diagnostics.Pages)
+    //     {
+    //         string pageNumber = $"Page {page.PageIndex}";
+    //         YesNoBool usedFallbackExtraction = page.UsedFallbackExtraction;
+    //         int tableCount = page.Tables.Count;
+    //         int rowCount = page.Tables
+    //             .Select(x => x.RowCount)
+    //             .Sum();
+    //
+    //         diagnosticsGrid.Rows.Add(pageNumber, usedFallbackExtraction, tableCount, rowCount);
+    //     }
+    //
+    //     diagnosticsGrid.Display();
+    // }
 
     private static void ExportToCsv(ContributionsDocument document)
     {
