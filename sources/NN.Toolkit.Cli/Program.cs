@@ -135,8 +135,12 @@ internal static class Program
 
                             return new ImportFundFromWebUseCase(from, to, year, new UnitOfWork(new Database()));
                         }
-                        
-                        throw new Exception("Unknown command: fund " + verb.Value);
+
+                        {
+                            UnitOfWork unitOfWork = new(new Database());
+                            FileSystemService fileSystemService = new();
+                            return new ImportFundFromFileUseCase(null, unitOfWork, fileSystemService);
+                        }
                     }
 
                     case "export":

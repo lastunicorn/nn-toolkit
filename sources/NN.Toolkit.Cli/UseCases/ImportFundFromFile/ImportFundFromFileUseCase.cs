@@ -4,6 +4,7 @@ using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.Domain;
 using DustInTheWind.NN.Toolkit.Cli.Ports.FileSystemAccess;
 using System.Globalization;
+using DustInTheWind.ConsoleTools;
 using DustInTheWind.ConsoleTools.Controls;
 using DustInTheWind.ConsoleTools.Controls.Tables;
 
@@ -26,21 +27,36 @@ internal class ImportFundFromFileUseCase : IUseCase
     {
         if (filePath == null) throw new ArgumentNullException(nameof(filePath));
 
-        IEnumerable<FundNav> fundNavs = ReadFromFile();
+        IEnumerable<string> filePaths = fileSystemService.IsDirectory(filePath)
+            ? fileSystemService.GetFiles(filePath, "*.csv")
+            : [filePath];
 
-        ImportDiagnostics importDiagnostics = Import(fundNavs);
-        DisplayImportDiagnostics(importDiagnostics);
+        ImportDiagnostics totalDiagnostics = new();
+
+        foreach (string path in filePaths)
+        {
+            IEnumerable<FundNav> fundNavs = ReadFromFile(path);
+            ImportDiagnostics importDiagnostics = Import(fundNavs);
+            DisplayImportDiagnostics(Path.GetFileName(path), importDiagnostics);
+
+            totalDiagnostics.AddCount += importDiagnostics.AddCount;
+            totalDiagnostics.UpdateCount += importDiagnostics.UpdateCount;
+            totalDiagnostics.SkipCount += importDiagnostics.SkipCount;
+        }
+
+        CustomConsole.WriteLineSuccess("Fund values imported successfully");
+        DisplayImportDiagnostics("Total", totalDiagnostics);
 
         unitOfWork.SaveChanges();
     }
 
-    private IEnumerable<FundNav> ReadFromFile()
+    private IEnumerable<FundNav> ReadFromFile(string path)
     {
-        Console.WriteLine($"Importing {filePath}");
-        
+        Console.WriteLine($"Importing {path} ...");
+
         CsvConfiguration config = new(CultureInfo.InvariantCulture);
 
-        using StreamReader streamReader = fileSystemService.OpenStreamReader(filePath);
+        using StreamReader streamReader = fileSystemService.OpenStreamReader(path);
         using CsvReader csv = new(streamReader, config);
         csv.Context.RegisterClassMap<FundNavMap>();
 
@@ -74,10 +90,11 @@ internal class ImportFundFromFileUseCase : IUseCase
         return importDiagnostics;
     }
 
-    private void DisplayImportDiagnostics(ImportDiagnostics importDiagnostics)
+    private void DisplayImportDiagnostics(string title, ImportDiagnostics importDiagnostics)
     {
         DataGrid diagnosticsGrid = new()
         {
+            Title = title,
             Margin = new Thickness(0, 1, 0, 1)
         };
 
@@ -91,4 +108,3 @@ internal class ImportFundFromFileUseCase : IUseCase
         diagnosticsGrid.Display();
     }
 }
-

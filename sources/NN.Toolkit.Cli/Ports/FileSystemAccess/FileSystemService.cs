@@ -27,4 +27,18 @@ public class FileSystemService : IFileSystemService
 
         return new StreamReader(filePath);
     }
+
+    public IEnumerable<string> GetFiles(string directoryPath, string searchPattern)
+    {
+        if (directoryPath == null) throw new ArgumentNullException(nameof(directoryPath));
+
+        return Directory.GetFiles(directoryPath, searchPattern);
+    }
+
+    public bool IsDirectory(string path)
+    {
+        if (path == null) throw new ArgumentNullException(nameof(path));
+
+        return Directory.Exists(path);
+    }
 }
