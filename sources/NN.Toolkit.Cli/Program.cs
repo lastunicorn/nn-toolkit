@@ -89,6 +89,6 @@ internal static class Program
 
     private static IUseCase HandleFundCommand(Arguments arguments)
     {
-        return new ShowFundUseCase();
+        return new ShowFundUseCase(new UnitOfWork(new Database()));
     }
 }
