@@ -19,9 +19,10 @@ internal class ImportAccountUseCase : IUseCase
 
     public void Execute()
     {
-        string filePathSafe = filePath ?? "contributions.pdf";
-
-        DocumentLoadResult documentLoadResult = ParseDocument(filePathSafe);
+        if(filePath == null)
+            throw new  ArgumentNullException(nameof(filePath));
+        
+        DocumentLoadResult documentLoadResult = ParseDocument(filePath);
         DisplayParsingDiagnostics(documentLoadResult.Diagnostics);
 
         ImportDiagnostics importDiagnostics = Import(documentLoadResult.Document);

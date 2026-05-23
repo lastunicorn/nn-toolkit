@@ -41,4 +41,9 @@ public class FileSystemService : IFileSystemService
 
         return Directory.Exists(path);
     }
+
+    public StreamWriter OpenStreamWriter(string filePath)
+    {
+        return new StreamWriter(filePath);
+    }
 }

@@ -1,3 +1,4 @@
+using DustInTheWind.ConsoleTools;
 using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 
 namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ClearFund;
@@ -14,7 +15,8 @@ internal class ClearFundUseCase : IUseCase
     public void Execute()
     {
         unitOfWork.FundNavRepository.Clear();
+        unitOfWork.SaveChanges();
         
-        Console.WriteLine("All fund records have been cleared.");
+        CustomConsole.WriteLineSuccess("All fund records have been cleared.");
     }
 }

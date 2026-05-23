@@ -25,11 +25,11 @@ internal class ImportFundFromFileUseCase : IUseCase
 
     public void Execute()
     {
-        if (filePath == null) throw new ArgumentNullException(nameof(filePath));
+        string filePathSafe = filePath ?? Environment.CurrentDirectory;
 
-        IEnumerable<string> filePaths = fileSystemService.IsDirectory(filePath)
-            ? fileSystemService.GetFiles(filePath, "*.csv")
-            : [filePath];
+        IEnumerable<string> filePaths = fileSystemService.IsDirectory(filePathSafe)
+            ? fileSystemService.GetFiles(filePathSafe, "*.csv")
+            : [filePathSafe];
 
         ImportDiagnostics totalDiagnostics = new();
 
@@ -44,7 +44,6 @@ internal class ImportFundFromFileUseCase : IUseCase
             totalDiagnostics.SkipCount += importDiagnostics.SkipCount;
         }
 
-        CustomConsole.WriteLineSuccess("Fund values imported successfully");
         DisplayImportDiagnostics("Total", totalDiagnostics);
 
         unitOfWork.SaveChanges();
@@ -54,37 +53,52 @@ internal class ImportFundFromFileUseCase : IUseCase
     {
         Console.WriteLine($"Importing {path} ...");
 
-        CsvConfiguration config = new(CultureInfo.InvariantCulture);
+        try
+        {
+            CsvConfiguration config = new(CultureInfo.InvariantCulture);
 
-        using StreamReader streamReader = fileSystemService.OpenStreamReader(path);
-        using CsvReader csv = new(streamReader, config);
-        csv.Context.RegisterClassMap<FundNavMap>();
+            using StreamReader streamReader = fileSystemService.OpenStreamReader(path);
+            using CsvReader csv = new(streamReader, config);
+            csv.Context.RegisterClassMap<FundNavMap>();
 
-        return csv.GetRecords<FundNav>().ToList();
+            return csv.GetRecords<FundNav>().ToList();
+        }
+        catch (Exception ex)
+        {
+            CustomConsole.WriteLineError($"Error reading file '{path}': {ex}");
+            return Enumerable.Empty<FundNav>();
+        }
     }
 
     private ImportDiagnostics Import(IEnumerable<FundNav> fundNavs)
     {
         ImportDiagnostics importDiagnostics = new();
 
-        foreach (FundNav fundNav in fundNavs)
+        try
         {
-            FundNav existingFundNav = unitOfWork.FundNavRepository.Get(fundNav.Date);
+            foreach (FundNav fundNav in fundNavs)
+            {
+                FundNav existingFundNav = unitOfWork.FundNavRepository.Get(fundNav.Date);
 
-            if (existingFundNav == null)
-            {
-                unitOfWork.FundNavRepository.Add(fundNav);
-                importDiagnostics.AddCount++;
+                if (existingFundNav == null)
+                {
+                    unitOfWork.FundNavRepository.Add(fundNav);
+                    importDiagnostics.AddCount++;
+                }
+                else if (existingFundNav.Value == fundNav.Value)
+                {
+                    importDiagnostics.SkipCount++;
+                }
+                else
+                {
+                    existingFundNav.Value = fundNav.Value;
+                    importDiagnostics.UpdateCount++;
+                }
             }
-            else if (existingFundNav.Value == fundNav.Value)
-            {
-                importDiagnostics.SkipCount++;
-            }
-            else
-            {
-                existingFundNav.Value = fundNav.Value;
-                importDiagnostics.UpdateCount++;
-            }
+        }
+        catch (Exception ex)
+        {
+            importDiagnostics.Error = ex;
         }
 
         return importDiagnostics;
@@ -106,5 +120,8 @@ internal class ImportFundFromFileUseCase : IUseCase
         diagnosticsGrid.Rows.Add("Skip", importDiagnostics.SkipCount);
 
         diagnosticsGrid.Display();
+
+        if (importDiagnostics.Error != null)
+            CustomConsole.WriteLineError($"Error importing fund values: {importDiagnostics.Error}");
     }
 }
