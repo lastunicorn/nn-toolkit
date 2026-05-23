@@ -7,12 +7,12 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
 internal class ExportAccountUseCase : IUseCase
 {
     private readonly string exportFormat;
-    private readonly ContributionRepository contributionRepository;
+    private readonly IUnitOfWork unitOfWork;
 
-    public ExportAccountUseCase(string exportFormat, ContributionRepository contributionRepository)
+    public ExportAccountUseCase(string exportFormat, IUnitOfWork unitOfWork)
     {
         this.exportFormat = exportFormat;
-        this.contributionRepository = contributionRepository ?? throw new ArgumentNullException(nameof(contributionRepository));
+        this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public void Execute()
@@ -22,7 +22,7 @@ internal class ExportAccountUseCase : IUseCase
         switch (exportFormatSafe.ToLower())
         {
             case "pp":
-                IEnumerable<Contribution> contributions = contributionRepository.GetAll();
+                IEnumerable<Contribution> contributions = unitOfWork.ContributionRepository.GetAll();
                 ExportToCsv(contributions);
                 break;
 

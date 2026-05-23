@@ -4,18 +4,18 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ClearAccount;
 
 internal class ClearAccountUseCase : IUseCase
 {
-    private readonly ContributionRepository contributionRepository;
+    private readonly IUnitOfWork unitOfWork;
 
-    public ClearAccountUseCase(ContributionRepository contributionRepository)
+    public ClearAccountUseCase(IUnitOfWork unitOfWork)
     {
-        this.contributionRepository = contributionRepository ?? throw new ArgumentNullException(nameof(contributionRepository));
+        this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public void Execute()
     {
-        contributionRepository.Clear();
-        contributionRepository.SaveChanges();
-        
+        unitOfWork.ContributionRepository.Clear();
+        unitOfWork.SaveChanges();
+
         Console.WriteLine("All contributions have been cleared from the database.");
     }
 }

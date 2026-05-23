@@ -42,39 +42,53 @@ internal static class Program
         if (noun?.Type != ArgumentType.Ordinal)
             return null;
 
-        switch (noun.Value)
+        return noun.Value switch
         {
-            case "help":
-                return new HelpUseCase();
+            "help" => new HelpUseCase(),
+            "account" => HandleAccountCommand(arguments),
+            "fund" => HandleFundCommand(arguments),
+            _ => throw new Exception("Unknown command: " + noun)
+        };
+    }
 
-            case "account":
-                Argument verb = arguments[1];
-                if (verb?.Type == ArgumentType.Ordinal)
-                    switch (verb.Value)
+    private static IUseCase HandleAccountCommand(Arguments arguments)
+    {
+        Argument verb = arguments[1];
+                
+        if(verb == null)
+            return new ShowAccountUseCase(new UnitOfWork(new Database()));
+                
+        switch (verb.Type)
+        {
+            case ArgumentType.Ordinal:
+                switch (verb.Value)
+                {
+                    case "import":
                     {
-                        case "import":
-                        {
-                            Argument file = arguments["file"] ?? arguments[2];
-                            return new ImportAccountUseCase(file?.Value, new ContributionRepository());
-                        }
-
-                        case "export":
-                        {
-                            Argument format = arguments["format"];
-                            return new ExportAccountUseCase(format?.Value, new ContributionRepository());
-                        }
-
-                        case "clear":
-                            return new ClearAccountUseCase(new ContributionRepository());
+                        Argument file = arguments["file"] ?? arguments[2];
+                        return new ImportAccountUseCase(file?.Value, new UnitOfWork(new Database()));
                     }
 
-                return new ShowAccountUseCase();
+                    case "export":
+                    {
+                        Argument format = arguments["format"];
+                        return new ExportAccountUseCase(format?.Value, new UnitOfWork(new Database()));
+                    }
 
-            case "fund":
-                return new ShowFundUseCase();
-
-            default:
-                throw new Exception("Unknown command " + noun);
+                    case "clear":
+                        return new ClearAccountUseCase(new UnitOfWork(new Database()));
+                }
+                break;
+                    
+            case ArgumentType.Named:
+                return new ShowAccountUseCase(new UnitOfWork(new Database()));
         }
+
+        throw new Exception("Unknown command: account " + verb.Value);
+    }
+
+    private static IUseCase HandleFundCommand(Arguments arguments)
+    {
+        return new ShowFundUseCase();
     }
 }

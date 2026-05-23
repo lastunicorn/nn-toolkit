@@ -7,10 +7,16 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ShowAccount;
 
 internal class ShowAccountUseCase : IUseCase
 {
+    private readonly IUnitOfWork unitOfWork;
+
+    public ShowAccountUseCase(IUnitOfWork unitOfWork)
+    {
+        this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+    }
+    
     public void Execute()
     {
-        ContributionRepository repository = new();
-        IEnumerable<Contribution> contributions = repository.GetAll();
+        IEnumerable<Contribution> contributions = unitOfWork.ContributionRepository.GetAll();
 
         DisplayContributions(contributions);
     }

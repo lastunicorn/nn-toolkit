@@ -9,12 +9,12 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ImportAccount;
 internal class ImportAccountUseCase : IUseCase
 {
     private readonly string filePath;
-    private readonly ContributionRepository contributionRepository;
+    private readonly IUnitOfWork unitOfWork;
 
-    public ImportAccountUseCase(string filePath, ContributionRepository contributionRepository)
+    public ImportAccountUseCase(string filePath, IUnitOfWork unitOfWork)
     {
         this.filePath = filePath;
-        this.contributionRepository = contributionRepository ?? throw new ArgumentNullException(nameof(contributionRepository));
+        this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public void Execute()
@@ -26,6 +26,8 @@ internal class ImportAccountUseCase : IUseCase
 
         ImportDiagnostics importDiagnostics = Import(documentLoadResult.Document);
         DisplayImportDiagnostics(importDiagnostics);
+
+        unitOfWork.SaveChanges();
     }
 
     private DocumentLoadResult ParseDocument(string filePath)
@@ -75,11 +77,11 @@ internal class ImportAccountUseCase : IUseCase
 
         foreach (Contribution contribution in contributionsDocument)
         {
-            Contribution existingContribution = contributionRepository.Get(contribution.Month);
+            Contribution existingContribution = unitOfWork.ContributionRepository.Get(contribution.Month);
 
             if (existingContribution == null)
             {
-                contributionRepository.Add(contribution);
+                unitOfWork.ContributionRepository.Add(contribution);
                 importDiagnostics.AddCount++;
             }
             else
@@ -101,8 +103,6 @@ internal class ImportAccountUseCase : IUseCase
                 }
             }
         }
-
-        contributionRepository.SaveChanges();
 
         Console.WriteLine();
         Console.WriteLine("Data imported successfully.");
