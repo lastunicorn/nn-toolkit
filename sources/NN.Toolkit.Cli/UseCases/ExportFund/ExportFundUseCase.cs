@@ -1,10 +1,10 @@
 using CsvHelper;
-using DustInTheWind.NN.Toolkit.Cli.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.Domain;
 using DustInTheWind.NN.Toolkit.Cli.Ports.FileSystemAccess;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromFile;
 using System.Globalization;
 using DustInTheWind.ConsoleTools;
+using DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ExportFund;
 

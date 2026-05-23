@@ -1,6 +1,6 @@
 using DustInTheWind.NN.Toolkit.Cli.Domain;
 
-namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
+namespace DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 public class FundNavRepository
 {

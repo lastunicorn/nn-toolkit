@@ -1,5 +1,5 @@
 using DustInTheWind.ConsoleTools;
-using DustInTheWind.NN.Toolkit.Cli.DataAccess;
+using DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ClearFund;
 

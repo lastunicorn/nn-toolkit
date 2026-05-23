@@ -1,5 +1,5 @@
 ﻿using DustInTheWind.ConsoleTools.Arguments;
-using DustInTheWind.NN.Toolkit.Cli.DataAccess;
+using DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 using DustInTheWind.NN.Toolkit.Cli.Ports.FileSystemAccess;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ClearFund;

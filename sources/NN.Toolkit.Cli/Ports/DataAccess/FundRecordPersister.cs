@@ -1,7 +1,7 @@
 using System.Text.Json;
 using DustInTheWind.NN.Toolkit.Cli.Domain;
 
-namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
+namespace DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 public class FundRecordPersister : IEntityPersister<FundNav>
 {

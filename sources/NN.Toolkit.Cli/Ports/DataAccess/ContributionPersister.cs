@@ -1,7 +1,7 @@
 using System.Text.Json;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
-namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
+namespace DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 public class ContributionPersister : IEntityPersister<Contribution>
 {

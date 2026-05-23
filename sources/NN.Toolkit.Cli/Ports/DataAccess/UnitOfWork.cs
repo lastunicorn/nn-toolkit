@@ -1,4 +1,4 @@
-namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
+namespace DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 internal class UnitOfWork: IUnitOfWork
 {

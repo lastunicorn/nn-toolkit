@@ -1,7 +1,7 @@
 using DustInTheWind.NN.Toolkit.Cli.Domain;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
-namespace DustInTheWind.NN.Toolkit.Cli.DataAccess;
+namespace DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 public class Database
 {
