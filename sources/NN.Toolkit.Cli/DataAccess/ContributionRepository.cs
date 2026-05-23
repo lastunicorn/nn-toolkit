@@ -19,6 +19,11 @@ public class ContributionRepository
         return contributions;
     }
 
+    public Contribution Get(MonthDate contributionMonth)
+    {
+        return contributions.FirstOrDefault(x => x.Month == contributionMonth);
+    }
+
     public void Add(Contribution contribution)
     {
         if (contribution == null) throw new ArgumentNullException(nameof(contribution));

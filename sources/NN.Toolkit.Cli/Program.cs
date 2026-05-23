@@ -48,8 +48,8 @@ internal static class Program
         if (arguments.Count == 0)
             return null;
 
-        Argument noun = arguments[1];
-        if (noun.Type != ArgumentType.Ordinal)
+        Argument noun = arguments[0];
+        if (noun?.Type != ArgumentType.Ordinal)
             return null;
 
         switch (noun.Value)
@@ -58,11 +58,11 @@ internal static class Program
                 return new HelpUseCase();
 
             case "account":
-                Argument verb = arguments[2];
-                if (verb.Type == ArgumentType.Ordinal && verb.Value == "import")
+                Argument verb = arguments[1];
+                if (verb is { Type: ArgumentType.Ordinal, Value: "import" })
                 {
                     Argument file = arguments["file"];
-                    return new ImportAccountUseCase(file.Value, new ContributionRepository());
+                    return new ImportAccountUseCase(file?.Value, new ContributionRepository());
                 }
 
                 return new ShowAccountUseCase();

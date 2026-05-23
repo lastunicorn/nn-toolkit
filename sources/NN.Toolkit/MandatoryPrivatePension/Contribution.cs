@@ -4,19 +4,19 @@ namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
 public class Contribution
 {
-    public MonthDate Month { get; init; }
+    public MonthDate Month { get; set; }
 
-    public decimal GrossValue { get; init; }
+    public decimal GrossValue { get; set; }
 
-    public decimal AdministrationFee { get; init; }
+    public decimal AdministrationFee { get; set; }
 
-    public decimal NetValue { get; init; }
+    public decimal NetValue { get; set; }
 
-    public decimal UnitValue { get; init; }
+    public decimal UnitValue { get; set; }
 
-    public decimal UnitCount { get; init; }
+    public decimal UnitCount { get; set; }
 
-    public MonthDate PaidInMonth { get; init; }
+    public MonthDate PaidInMonth { get; set; }
 
     public string[] ToStringArray()
     {
