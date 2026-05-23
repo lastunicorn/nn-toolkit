@@ -17,7 +17,7 @@ internal class ImportAccountUseCase : IUseCase
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
-    public void Execute()
+    public async Task Execute()
     {
         if(filePath == null)
             throw new  ArgumentNullException(nameof(filePath));
@@ -28,7 +28,7 @@ internal class ImportAccountUseCase : IUseCase
         ImportDiagnostics importDiagnostics = Import(documentLoadResult.Document);
         DisplayImportDiagnostics(importDiagnostics);
 
-        unitOfWork.SaveChanges();
+        await unitOfWork.SaveChangesAsync();
     }
 
     private DocumentLoadResult ParseDocument(string filePath)

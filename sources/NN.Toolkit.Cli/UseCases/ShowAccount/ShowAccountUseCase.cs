@@ -14,11 +14,12 @@ internal class ShowAccountUseCase : IUseCase
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
     
-    public void Execute()
+    public Task Execute()
     {
         IEnumerable<Contribution> contributions = unitOfWork.ContributionRepository.GetAll();
-
         DisplayContributions(contributions);
+        
+        return Task.CompletedTask;
     }
 
     private void DisplayContributions(IEnumerable<Contribution> contributions)

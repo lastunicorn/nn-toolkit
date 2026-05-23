@@ -13,8 +13,8 @@ internal class UnitOfWork: IUnitOfWork
         this.database = database ?? throw new ArgumentNullException(nameof(database));
     }
 
-    public void SaveChanges()
+    public Task SaveChangesAsync()
     {
-        database.SaveAll();
+        return database.SaveAllAsync();
     }
 }

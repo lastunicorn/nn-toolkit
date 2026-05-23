@@ -2,7 +2,7 @@ namespace DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 public interface IEntityPersister<T>
 {
-    IEnumerable<T> Load();
+    Task<IEnumerable<T>> LoadAsync();
     
-    void Save(IEnumerable<T> entities);
+    Task SaveAsync(IEnumerable<T> entities);
 }

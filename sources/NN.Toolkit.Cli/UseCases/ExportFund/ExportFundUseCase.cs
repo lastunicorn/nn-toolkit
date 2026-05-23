@@ -21,19 +21,19 @@ internal class ExportFundUseCase : IUseCase
         this.fileSystemService = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
     }
 
-    public void Execute()
+    public async Task Execute()
     {
         if (filePath == null)
             throw new ArgumentNullException(nameof(filePath));
 
         IEnumerable<FundNav> fundNavs = unitOfWork.FundNavRepository.GetAll();
 
-        using StreamWriter writer = fileSystemService.OpenStreamWriter(filePath);
-        using CsvWriter csv = new(writer, CultureInfo.InvariantCulture);
+        await using StreamWriter writer = fileSystemService.OpenStreamWriter(filePath);
+        await using CsvWriter csv = new(writer, CultureInfo.InvariantCulture);
 
         csv.Context.RegisterClassMap<FundNavMap>();
         csv.Context.TypeConverterOptionsCache.GetOptions<DateOnly>().Formats = ["yyyy-MM-dd"];
-        csv.WriteRecords(fundNavs);
+        await csv.WriteRecordsAsync(fundNavs);
 
         Console.WriteLine();
         CustomConsole.WriteLineSuccess($"Fund NAV values were exported to: {filePath}");

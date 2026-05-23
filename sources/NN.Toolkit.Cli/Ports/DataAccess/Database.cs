@@ -5,25 +5,25 @@ namespace DustInTheWind.NN.Toolkit.Cli.Ports.DataAccess;
 
 public class Database
 {
-    public List<Contribution> Contributions { get; } = [];
+	public List<Contribution> Contributions { get; } = [];
 
-    public List<FundNav> FundRecords { get; } = [];
+	public List<FundNav> FundRecords { get; } = [];
 
-    public Database()
-    {
-        ContributionPersister contributionPersister = new();
-        Contributions.AddRange(contributionPersister.Load());
+	public async Task OpenAsync()
+	{
+		ContributionPersister contributionPersister = new();
+		Contributions.AddRange(await contributionPersister.LoadAsync());
 
-        FundRecordPersister fundRecordPersister = new();
-        FundRecords.AddRange(fundRecordPersister.Load());
-    }
+		FundRecordPersister fundRecordPersister = new();
+		FundRecords.AddRange(await fundRecordPersister.LoadAsync());
+	}
 
-    public void SaveAll()
-    {
-        ContributionPersister contributionPersister = new();
-        contributionPersister.Save(Contributions);
+	public async Task SaveAllAsync()
+	{
+		ContributionPersister contributionPersister = new();
+		await contributionPersister.SaveAsync(Contributions);
 
-        FundRecordPersister fundRecordPersister = new();
-        fundRecordPersister.Save(FundRecords);
-    }
+		FundRecordPersister fundRecordPersister = new();
+		await fundRecordPersister.SaveAsync(FundRecords);
+	}
 }

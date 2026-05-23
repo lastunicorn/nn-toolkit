@@ -4,7 +4,7 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.Help;
 
 public class HelpUseCase : IUseCase
 {
-    public void Execute()
+    public Task Execute()
     {
         XConsole.Create()
             .WriteLine("Usage:")
@@ -63,5 +63,7 @@ public class HelpUseCase : IUseCase
             .WriteLine("help")
             .With(ConsoleColor.DarkGray, null)
             .WriteLine("  Displays this help message.");
+        
+        return Task.CompletedTask;
     }
 }

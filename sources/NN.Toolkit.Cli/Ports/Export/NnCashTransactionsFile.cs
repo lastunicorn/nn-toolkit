@@ -12,10 +12,10 @@ internal sealed class NnCashTransactionsFile : IDisposable, IAsyncDisposable
         output.WriteLine("Type,Cash Account,Date,Time,Value,Note");
     }
 
-    public void Write(Contribution contribution)
+    public Task WriteAsync(Contribution contribution)
     {
         string date = $"{contribution.PaidInMonth.Year:00}-{contribution.PaidInMonth.Month:00}-01";
-        output.WriteLine($"Deposit,NN,{date},08:00,{contribution.GrossValue},\"Luna: {contribution.Month}\"");
+        return output.WriteLineAsync($"Deposit,NN,{date},08:00,{contribution.GrossValue},\"Luna: {contribution.Month}\"");
     }
 
     public void Dispose()

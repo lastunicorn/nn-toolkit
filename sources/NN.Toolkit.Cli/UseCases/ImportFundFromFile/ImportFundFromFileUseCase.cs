@@ -23,7 +23,7 @@ internal class ImportFundFromFileUseCase : IUseCase
         this.fileSystemService = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
     }
 
-    public void Execute()
+    public async Task Execute()
     {
         string filePathSafe = filePath ?? Environment.CurrentDirectory;
 
@@ -46,7 +46,7 @@ internal class ImportFundFromFileUseCase : IUseCase
 
         DisplayImportDiagnostics("Total", totalDiagnostics);
 
-        unitOfWork.SaveChanges();
+        await unitOfWork.SaveChangesAsync();
     }
 
     private IEnumerable<FundNav> ReadFromFile(string path)

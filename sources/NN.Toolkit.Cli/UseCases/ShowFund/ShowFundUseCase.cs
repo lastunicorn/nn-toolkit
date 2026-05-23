@@ -14,11 +14,12 @@ internal class ShowFundUseCase : IUseCase
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
-    public void Execute()
+    public Task Execute()
     {
         IEnumerable<FundNav> fundRecords = unitOfWork.FundNavRepository.GetAll();
-
         DisplayFundRecords(fundRecords);
+        
+        return Task.CompletedTask;
     }
 
     private void DisplayFundRecords(IEnumerable<FundNav> fundRecords)

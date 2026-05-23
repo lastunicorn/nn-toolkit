@@ -6,5 +6,5 @@ internal interface IUnitOfWork
 
     FundNavRepository FundNavRepository { get; }
 
-    void SaveChanges();
+    Task SaveChangesAsync();
 }

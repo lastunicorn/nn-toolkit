@@ -11,10 +11,10 @@ internal class ClearAccountUseCase : IUseCase
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
-    public void Execute()
+    public async Task Execute()
     {
         unitOfWork.ContributionRepository.Clear();
-        unitOfWork.SaveChanges();
+        await unitOfWork.SaveChangesAsync();
 
         Console.WriteLine("All contributions have been cleared from the database.");
     }

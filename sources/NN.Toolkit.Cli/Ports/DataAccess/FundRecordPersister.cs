@@ -13,25 +13,25 @@ public class FundRecordPersister : IEntityPersister<FundNav>
         WriteIndented = true
     };
 
-    public IEnumerable<FundNav> Load()
+    public async Task<IEnumerable<FundNav>> LoadAsync()
     {
         string filePath = Path.Combine(DatabasePath, FileName);
 
         if (!File.Exists(filePath))
             return [];
 
-        string json = File.ReadAllText(filePath);
+        string json = await File.ReadAllTextAsync(filePath);
         return JsonSerializer.Deserialize<List<FundNav>>(json, jsonSerializerOptions) ?? [];
     }
 
-    public void Save(IEnumerable<FundNav> fundRecords)
+    public Task SaveAsync(IEnumerable<FundNav> fundRecords)
     {
         if (!Directory.Exists(DatabasePath))
             Directory.CreateDirectory(DatabasePath);
 
         string filePath = Path.Combine(DatabasePath, FileName);
         string json = JsonSerializer.Serialize(fundRecords, jsonSerializerOptions);
-        File.WriteAllText(filePath, json);
+        return File.WriteAllTextAsync(filePath, json);
     }
 }
 

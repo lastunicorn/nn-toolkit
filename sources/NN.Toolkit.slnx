@@ -1,7 +1,8 @@
 <Solution>
     <Folder Name="/SolutionItems/">
-        <File Path="Directory.Build.props"/>
+        <File Path="Directory.Build.props" />
     </Folder>
-    <Project Path="NN.Toolkit.Cli/NN.Toolkit.Cli.csproj"/>
-    <Project Path="NN.Toolkit/NN.Toolkit.csproj"/>
+    <Project Path="NN.Toolkit.Cli.Tests/NN.Toolkit.Cli.Tests.csproj" />
+    <Project Path="NN.Toolkit.Cli/NN.Toolkit.Cli.csproj" />
+    <Project Path="NN.Toolkit/NN.Toolkit.csproj" />
 </Solution>

@@ -15,7 +15,7 @@ internal class ExportAccountUseCase : IUseCase
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
-    public void Execute()
+    public async Task Execute()
     {
         string exportFormatSafe = exportFormat ?? "pp";
 
@@ -23,18 +23,16 @@ internal class ExportAccountUseCase : IUseCase
         {
             case "pp":
                 IEnumerable<Contribution> contributions = unitOfWork.ContributionRepository.GetAll();
-                ExportToCsv(contributions);
+                await ExportToCsv(contributions);
                 break;
 
             default:
                 Console.WriteLine($"Export format '{exportFormat}' is not supported.");
                 break;
-            {
-            }
         }
     }
 
-    private static void ExportToCsv(IEnumerable<Contribution> contributions)
+    private static async Task ExportToCsv(IEnumerable<Contribution> contributions)
     {
         string[] labels =
         [
@@ -47,13 +45,13 @@ internal class ExportAccountUseCase : IUseCase
             "Plătită în luna"
         ];
         
-        using NnTransactionsFile nnTransactionsFile = new("NN_transactions.csv", labels);
-        using NnCashTransactionsFile nnCashTransactionsFile = new("NN_cash_transactions.csv");
+        await using NnTransactionsFile nnTransactionsFile = new("NN_transactions.csv", labels);
+        await using NnCashTransactionsFile nnCashTransactionsFile = new("NN_cash_transactions.csv");
 
         foreach (Contribution contribution in contributions)
         {
-            nnTransactionsFile.Write(contribution);
-            nnCashTransactionsFile.Write(contribution);
+            await nnTransactionsFile.WriteAsync(contribution);
+            await nnCashTransactionsFile.WriteAsync(contribution);
         }
 
         Console.WriteLine();

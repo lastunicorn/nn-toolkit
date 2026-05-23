@@ -8,6 +8,7 @@ using DustInTheWind.NN.Toolkit.Cli.UseCases.ExportFund;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.Help;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromFile;
+using DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromWeb;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ShowAccount;
 using DustInTheWind.NN.Toolkit.Cli.UseCases.ShowFund;
 
@@ -29,207 +30,268 @@ namespace DustInTheWind.NN.Toolkit.Cli;
 
 internal static class Program
 {
-    internal static void Main(string[] args)
-    {
-        Arguments arguments = new(args);
+	internal static Task Main(string[] args)
+	{
+		Arguments arguments = new(args);
 
-        IUseCase useCase = CreateUseCase(arguments) ?? new HelpUseCase();
-        useCase.Execute();
-    }
+		IUseCase useCase = CreateUseCase(arguments) ?? new HelpUseCase();
+		return useCase.Execute();
+	}
 
-    private static IUseCase CreateUseCase(Arguments arguments)
-    {
-        if (arguments.Count == 0)
-            return null;
+	private static IUseCase CreateUseCase(Arguments arguments)
+	{
+		if (arguments.Count == 0)
+			return null;
 
-        Argument noun = arguments[0];
-        if (noun?.Type != ArgumentType.Ordinal)
-            return null;
+		Argument noun = arguments[0];
+		if (noun?.Type != ArgumentType.Ordinal)
+			return null;
 
-        return TryCreateImportAccountUseCase(arguments)
-               ?? TryCreateExportAccountUseCase(arguments)
-               ?? TryCreateClearAccountUseCase(arguments)
-               ?? TryCreateShowAccountUseCase(arguments)
-               ?? TryCreateImportFundFromFileUseCase(arguments)
-               ?? TryCreateExportFundUseCase(arguments)
-               ?? TryCreateClearFundUseCase(arguments)
-               ?? TryCreateShowFundUseCase(arguments)
-               ?? TryCreateHelpUseCase(arguments);
-    }
+		return TryCreateImportAccountUseCase(arguments)
+		       ?? TryCreateExportAccountUseCase(arguments)
+		       ?? TryCreateClearAccountUseCase(arguments)
+		       ?? TryCreateShowAccountUseCase(arguments)
+		       ?? TryCreateImportFundFromFileUseCase(arguments)
+		       ?? TryCreateImportFundFromWebUseCase(arguments)
+		       ?? TryCreateExportFundUseCase(arguments)
+		       ?? TryCreateClearFundUseCase(arguments)
+		       ?? TryCreateShowFundUseCase(arguments)
+		       ?? TryCreateHelpUseCase(arguments);
+	}
 
-    private static IUseCase TryCreateImportAccountUseCase(Arguments arguments)
-    {
-        Argument noun = arguments[0];
+	private static IUseCase TryCreateImportAccountUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
 
-        if (noun?.Value != "account")
-            return null;
+		if (noun?.Value != "account")
+			return null;
 
-        Argument verb = arguments[1];
+		Argument verb = arguments[1];
 
-        if (verb?.Value != "import")
-            return null;
+		if (verb?.Value != "import")
+			return null;
 
-        Argument fileArgument = arguments["file"] ?? arguments[2];
+		Argument fileArgument = arguments["file"] ?? arguments[2];
 
-        Database database = new();
-        UnitOfWork unitOfWork = new(database);
-        return new ImportAccountUseCase(fileArgument?.Value, unitOfWork);
-    }
+		Database database = new();
+		database.OpenAsync().GetAwaiter().GetResult();
+		UnitOfWork unitOfWork = new(database);
+		return new ImportAccountUseCase(fileArgument?.Value, unitOfWork);
+	}
 
-    private static IUseCase TryCreateExportAccountUseCase(Arguments arguments)
-    {
-        Argument noun = arguments[0];
+	private static IUseCase TryCreateExportAccountUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
 
-        if (noun?.Value != "account")
-            return null;
+		if (noun?.Value != "account")
+			return null;
 
-        Argument verb = arguments[1];
+		Argument verb = arguments[1];
 
-        if (verb?.Value != "export")
-            return null;
+		if (verb?.Value != "export")
+			return null;
 
-        Argument formatArgument = arguments["format"];
+		Argument formatArgument = arguments["format"];
 
-        Database database = new();
-        UnitOfWork unitOfWork = new(database);
-        return new ExportAccountUseCase(formatArgument?.Value, unitOfWork);
-    }
+		Database database = new();
+		database.OpenAsync().GetAwaiter().GetResult();
+		UnitOfWork unitOfWork = new(database);
+		return new ExportAccountUseCase(formatArgument?.Value, unitOfWork);
+	}
 
-    private static IUseCase TryCreateClearAccountUseCase(Arguments arguments)
-    {
-        Argument noun = arguments[0];
+	private static IUseCase TryCreateClearAccountUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
 
-        if (noun?.Value != "account")
-            return null;
+		if (noun?.Value != "account")
+			return null;
 
-        Argument verb = arguments[1];
+		Argument verb = arguments[1];
 
-        if (verb?.Value != "clear")
-            return null;
+		if (verb?.Value != "clear")
+			return null;
 
-        Database database = new();
-        UnitOfWork unitOfWork = new(database);
-        return new ClearAccountUseCase(unitOfWork);
-    }
+		Database database = new();
+		database.OpenAsync().GetAwaiter().GetResult();
+		UnitOfWork unitOfWork = new(database);
+		return new ClearAccountUseCase(unitOfWork);
+	}
 
-    private static IUseCase TryCreateShowAccountUseCase(Arguments arguments)
-    {
-        Argument noun = arguments[0];
+	private static IUseCase TryCreateShowAccountUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
 
-        if (noun?.Value != "account")
-            return null;
+		if (noun?.Value != "account")
+			return null;
 
-        Argument verb = arguments[1];
+		Argument verb = arguments[1];
 
-        if (verb != null && verb.Value != "show")
-            return null;
+		if (verb != null && verb.Value != "show")
+			return null;
 
-        Database database = new();
-        UnitOfWork unitOfWork = new(database);
-        return new ShowAccountUseCase(unitOfWork);
-    }
+		Database database = new();
+		database.OpenAsync().GetAwaiter().GetResult();
+		UnitOfWork unitOfWork = new(database);
+		return new ShowAccountUseCase(unitOfWork);
+	}
 
-    private static IUseCase TryCreateImportFundFromFileUseCase(Arguments arguments)
-    {
-        Argument noun = arguments[0];
+	private static IUseCase TryCreateImportFundFromFileUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
 
-        if (noun?.Value != "fund")
-            return null;
+		if (noun?.Value != "fund")
+			return null;
 
-        Argument verb = arguments[1];
+		Argument verb = arguments[1];
 
-        if (verb?.Value != "import")
-            return null;
+		if (verb?.Value != "import")
+			return null;
 
-        Argument sourceArgument = arguments["source"];
+		Argument sourceArgument = arguments["source"];
 
-        if (sourceArgument != null)
-        {
-            if (sourceArgument.Value == "file")
-            {
-                Argument fileArgument = arguments["file"];
+		if (sourceArgument != null)
+		{
+			if (sourceArgument.Value == "file")
+			{
+				Argument fileArgument = arguments["file"];
 
-                Database database = new();
-                UnitOfWork unitOfWork = new(database);
-                FileSystemService fileSystemService = new();
-                return new ImportFundFromFileUseCase(fileArgument?.Value, unitOfWork, fileSystemService);
-            }
-        }
-        else
-        {
-            Argument fileArgument = arguments["file"];
+				Database database = new();
+				database.OpenAsync().GetAwaiter().GetResult();
+				UnitOfWork unitOfWork = new(database);
+				FileSystemService fileSystemService = new();
+				return new ImportFundFromFileUseCase(fileArgument?.Value, unitOfWork, fileSystemService);
+			}
+		}
+		else
+		{
+			Argument fileArgument = arguments["file"];
 
-            if (fileArgument != null)
-            {
-                Database database = new();
-                UnitOfWork unitOfWork = new(database);
-                FileSystemService fileSystemService = new();
-                return new ImportFundFromFileUseCase(fileArgument.Value, unitOfWork, fileSystemService);
-            }
-        }
+			if (fileArgument != null)
+			{
+				Database database = new();
+				database.OpenAsync().GetAwaiter().GetResult();
+				UnitOfWork unitOfWork = new(database);
+				FileSystemService fileSystemService = new();
+				return new ImportFundFromFileUseCase(fileArgument.Value, unitOfWork, fileSystemService);
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private static IUseCase TryCreateExportFundUseCase(Arguments arguments)
-    {
-        Argument noun = arguments[0];
+	private static IUseCase TryCreateImportFundFromWebUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
 
-        if (noun?.Value != "fund")
-            return null;
+		if (noun?.Value != "fund")
+			return null;
 
-        Argument verb = arguments[1];
+		Argument verb = arguments[1];
 
-        if (verb?.Value != "export")
-            return null;
+		if (verb?.Value != "import")
+			return null;
 
-        Argument fileArgument = arguments["file"];
+		Argument sourceArgument = arguments["source"];
 
-        if (fileArgument == null)
-            return null;
+		if (sourceArgument != null)
+		{
+			if (sourceArgument.Value == "nn-api" || sourceArgument.Value == "web")
+			{
+				Argument yearArgument = arguments["year"];
 
-        Database database = new();
-        UnitOfWork unitOfWork = new(database);
-        FileSystemService fileSystemService = new();
-        return new ExportFundUseCase(fileArgument.Value, unitOfWork, fileSystemService);
-    }
+				if (yearArgument == null)
+					throw new ArgumentException("Year argument is required when source is 'nn-api' or 'web'.", nameof(arguments));
 
-    private static IUseCase TryCreateClearFundUseCase(Arguments arguments)
-    {
-        Argument noun = arguments[0];
+				int year = int.Parse(yearArgument.Value);
 
-        if (noun?.Value != "fund")
-            return null;
+				Database database = new();
+				database.OpenAsync().GetAwaiter().GetResult();
+				UnitOfWork unitOfWork = new(database);
+				return new ImportFundFromWebUseCase(null, null, year, unitOfWork);
+			}
+		}
+		else
+		{
+			Argument yearArgument = arguments["year"];
 
-        Argument verb = arguments[1];
+			int? year = yearArgument != null
+				? int.Parse(yearArgument.Value)
+				: null;
 
-        if (verb?.Value != "clear")
-            return null;
+			if (yearArgument != null)
+			{
+				Database database = new();
+				database.OpenAsync().GetAwaiter().GetResult();
+				UnitOfWork unitOfWork = new(database);
+				return new ImportFundFromWebUseCase(null, null, year, unitOfWork);
+			}
+		}
 
-        Database database = new();
-        UnitOfWork unitOfWork = new(database);
-        return new ClearFundUseCase(unitOfWork);
-    }
+		return null;
+	}
 
-    private static ShowFundUseCase TryCreateShowFundUseCase(Arguments arguments)
-    {
-        Argument noun = arguments[0];
+	private static IUseCase TryCreateExportFundUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
 
-        if (noun?.Value != "fund")
-            return null;
+		if (noun?.Value != "fund")
+			return null;
 
-        Argument verb = arguments[1];
+		Argument verb = arguments[1];
 
-        if (verb != null && verb.Value != "show")
-            return null;
+		if (verb?.Value != "export")
+			return null;
 
-        Database database = new();
-        UnitOfWork unitOfWork = new(database);
-        return new ShowFundUseCase(unitOfWork);
-    }
+		Argument fileArgument = arguments["file"];
 
-    private static IUseCase TryCreateHelpUseCase(Arguments arguments)
-    {
-        return new HelpUseCase();
-    }
+		if (fileArgument == null)
+			return null;
+
+		Database database = new();
+		database.OpenAsync().GetAwaiter().GetResult();
+		UnitOfWork unitOfWork = new(database);
+		FileSystemService fileSystemService = new();
+		return new ExportFundUseCase(fileArgument.Value, unitOfWork, fileSystemService);
+	}
+
+	private static IUseCase TryCreateClearFundUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
+
+		if (noun?.Value != "fund")
+			return null;
+
+		Argument verb = arguments[1];
+
+		if (verb?.Value != "clear")
+			return null;
+
+		Database database = new();
+		database.OpenAsync().GetAwaiter().GetResult();
+		UnitOfWork unitOfWork = new(database);
+		return new ClearFundUseCase(unitOfWork);
+	}
+
+	private static ShowFundUseCase TryCreateShowFundUseCase(Arguments arguments)
+	{
+		Argument noun = arguments[0];
+
+		if (noun?.Value != "fund")
+			return null;
+
+		Argument verb = arguments[1];
+
+		if (verb != null && verb.Value != "show")
+			return null;
+
+		Database database = new();
+		database.OpenAsync().GetAwaiter().GetResult();
+		UnitOfWork unitOfWork = new(database);
+		return new ShowFundUseCase(unitOfWork);
+	}
+
+	private static IUseCase TryCreateHelpUseCase(Arguments arguments)
+	{
+		return new HelpUseCase();
+	}
 }

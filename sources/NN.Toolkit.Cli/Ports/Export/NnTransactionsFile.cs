@@ -15,14 +15,14 @@ internal sealed class NnTransactionsFile : IDisposable, IAsyncDisposable
         output.WriteLine("Security Name,Ticker Symbol,Date,Time,Value,Shares,Type,Fees,Note");
     }
 
-    public void Write(Contribution contribution)
+    public Task WriteAsync(Contribution contribution)
     {
         string date = $"{contribution.PaidInMonth.Year:00}-{contribution.PaidInMonth.Month:00}-01";
         string note = labels == null
             ? string.Empty
             : string.Join("; ", labels.Zip(contribution.ToStringArray(), (h, v) => $"{h}={v}"));
 
-        output.WriteLine($"NN,NN,{date},08:05,{contribution.GrossValue},{contribution.UnitCount},Buy,{contribution.AdministrationFee},\"{note}\"");
+        return output.WriteLineAsync($"NN,NN,{date},08:05,{contribution.GrossValue},{contribution.UnitCount},Buy,{contribution.AdministrationFee},\"{note}\"");
     }
 
     public void Dispose()
