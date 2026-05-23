@@ -8,21 +8,21 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ImportAccount;
 
 internal class ImportAccountUseCase : IUseCase
 {
-    private readonly string filePath;
     private readonly IUnitOfWork unitOfWork;
 
-    public ImportAccountUseCase(string filePath, IUnitOfWork unitOfWork)
+    public string FilePath { get; init; }
+
+    public ImportAccountUseCase(IUnitOfWork unitOfWork)
     {
-        this.filePath = filePath;
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task Execute()
     {
-        if(filePath == null)
-            throw new  ArgumentNullException(nameof(filePath));
-        
-        DocumentLoadResult documentLoadResult = ParseDocument(filePath);
+        if (FilePath == null)
+            throw new ArgumentNullException(nameof(FilePath));
+
+        DocumentLoadResult documentLoadResult = ParseDocument(FilePath);
         DisplayParsingDiagnostics(documentLoadResult.Diagnostics);
 
         ImportDiagnostics importDiagnostics = Import(documentLoadResult.Document);

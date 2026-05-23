@@ -6,18 +6,18 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ExportAccount;
 
 internal class ExportAccountUseCase : IUseCase
 {
-    private readonly string exportFormat;
     private readonly IUnitOfWork unitOfWork;
+    
+    public string ExportFormat { get; init; }
 
-    public ExportAccountUseCase(string exportFormat, IUnitOfWork unitOfWork)
+    public ExportAccountUseCase(IUnitOfWork unitOfWork)
     {
-        this.exportFormat = exportFormat;
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task Execute()
     {
-        string exportFormatSafe = exportFormat ?? "pp";
+        string exportFormatSafe = ExportFormat ?? "pp";
 
         switch (exportFormatSafe.ToLower())
         {
@@ -27,7 +27,7 @@ internal class ExportAccountUseCase : IUseCase
                 break;
 
             default:
-                Console.WriteLine($"Export format '{exportFormat}' is not supported.");
+                Console.WriteLine($"Export format '{ExportFormat}' is not supported.");
                 break;
         }
     }

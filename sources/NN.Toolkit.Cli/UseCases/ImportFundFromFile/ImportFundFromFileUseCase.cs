@@ -12,20 +12,20 @@ namespace DustInTheWind.NN.Toolkit.Cli.UseCases.ImportFundFromFile;
 
 internal class ImportFundFromFileUseCase : IUseCase
 {
-    private readonly string filePath;
+    public string FilePath { get; init; }
+
     private readonly IUnitOfWork unitOfWork;
     private readonly IFileSystemService fileSystemService;
 
-    public ImportFundFromFileUseCase(string filePath, IUnitOfWork unitOfWork, IFileSystemService fileSystemService)
+    public ImportFundFromFileUseCase(IUnitOfWork unitOfWork, IFileSystemService fileSystemService)
     {
-        this.filePath = filePath;
         this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         this.fileSystemService = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
     }
 
     public async Task Execute()
     {
-        string filePathSafe = filePath ?? Environment.CurrentDirectory;
+        string filePathSafe = FilePath ?? Environment.CurrentDirectory;
 
         IEnumerable<string> filePaths = fileSystemService.IsDirectory(filePathSafe)
             ? fileSystemService.GetFiles(filePathSafe, "*.csv")

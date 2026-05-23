@@ -76,7 +76,10 @@ internal static class Program
 		Database database = new();
 		database.OpenAsync().GetAwaiter().GetResult();
 		UnitOfWork unitOfWork = new(database);
-		return new ImportAccountUseCase(fileArgument?.Value, unitOfWork);
+		return new ImportAccountUseCase(unitOfWork)
+		{
+			FilePath = fileArgument?.Value
+		};
 	}
 
 	private static IUseCase TryCreateExportAccountUseCase(Arguments arguments)
@@ -96,7 +99,10 @@ internal static class Program
 		Database database = new();
 		database.OpenAsync().GetAwaiter().GetResult();
 		UnitOfWork unitOfWork = new(database);
-		return new ExportAccountUseCase(formatArgument?.Value, unitOfWork);
+		return new ExportAccountUseCase(unitOfWork)
+		{
+			ExportFormat = formatArgument?.Value
+		};
 	}
 
 	private static IUseCase TryCreateClearAccountUseCase(Arguments arguments)
@@ -159,7 +165,10 @@ internal static class Program
 				database.OpenAsync().GetAwaiter().GetResult();
 				UnitOfWork unitOfWork = new(database);
 				FileSystemService fileSystemService = new();
-				return new ImportFundFromFileUseCase(fileArgument?.Value, unitOfWork, fileSystemService);
+				return new ImportFundFromFileUseCase(unitOfWork, fileSystemService)
+				{
+					FilePath = fileArgument?.Value
+				};
 			}
 		}
 		else
@@ -172,7 +181,10 @@ internal static class Program
 				database.OpenAsync().GetAwaiter().GetResult();
 				UnitOfWork unitOfWork = new(database);
 				FileSystemService fileSystemService = new();
-				return new ImportFundFromFileUseCase(fileArgument.Value, unitOfWork, fileSystemService);
+				return new ImportFundFromFileUseCase(unitOfWork, fileSystemService)
+				{
+					FilePath = fileArgument.Value
+				};
 			}
 		}
 
@@ -207,7 +219,10 @@ internal static class Program
 				Database database = new();
 				database.OpenAsync().GetAwaiter().GetResult();
 				UnitOfWork unitOfWork = new(database);
-				return new ImportFundFromWebUseCase(null, null, year, unitOfWork);
+				return new ImportFundFromWebUseCase(unitOfWork)
+				{
+					Year = year
+				};
 			}
 		}
 		else
@@ -223,7 +238,10 @@ internal static class Program
 				Database database = new();
 				database.OpenAsync().GetAwaiter().GetResult();
 				UnitOfWork unitOfWork = new(database);
-				return new ImportFundFromWebUseCase(null, null, year, unitOfWork);
+				return new ImportFundFromWebUseCase(unitOfWork)
+				{
+					Year = year
+				};
 			}
 		}
 
@@ -251,7 +269,10 @@ internal static class Program
 		database.OpenAsync().GetAwaiter().GetResult();
 		UnitOfWork unitOfWork = new(database);
 		FileSystemService fileSystemService = new();
-		return new ExportFundUseCase(fileArgument.Value, unitOfWork, fileSystemService);
+		return new ExportFundUseCase(unitOfWork, fileSystemService)
+		{
+			FilePath = fileArgument.Value
+		};
 	}
 
 	private static IUseCase TryCreateClearFundUseCase(Arguments arguments)

@@ -17,37 +17,36 @@ internal class ImportFundFromWebUseCase : IUseCase
 
 	private readonly UnitOfWork unitOfWork;
 
-	private readonly DateOnly? fromDate;
-	private readonly DateOnly? toDate;
-	private readonly int? year;
+	public DateOnly? FromDate { get; init; }
+	
+	public DateOnly? ToDate { get; init; }
+	
+	public int? Year { get; init; }
 
-	public ImportFundFromWebUseCase(DateOnly? fromDate, DateOnly? toDate, int? year, UnitOfWork unitOfWork)
+	public ImportFundFromWebUseCase(UnitOfWork unitOfWork)
 	{
-		this.fromDate = fromDate;
-		this.toDate = toDate;
-		this.year = year;
 		this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 	}
 
 	public async Task Execute()
 	{
-		if (year == null)
-			throw new ArgumentNullException(nameof(year));
+		if (Year == null)
+			throw new ArgumentNullException(nameof(Year));
 
 		IEnumerable<FundNav> fundNavs = await ReadFromNnApi();
 
 		ImportDiagnostics importDiagnostics = Import(fundNavs);
-		DisplayImportDiagnostics($"Fund NAV values for {year}", importDiagnostics);
+		DisplayImportDiagnostics($"Fund NAV values for {Year}", importDiagnostics);
 
 		await unitOfWork.SaveChangesAsync();
 	}
 
 	private async Task<IEnumerable<FundNav>> ReadFromNnApi()
 	{
-		long dateRangeFrom = new DateTimeOffset(year.Value, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
-		long dateRangeTo = new DateTimeOffset(year.Value, 12, 31, 23, 59, 59, TimeSpan.Zero).ToUnixTimeMilliseconds();
+		long dateRangeFrom = new DateTimeOffset(Year.Value, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
+		long dateRangeTo = new DateTimeOffset(Year.Value, 12, 31, 23, 59, 59, TimeSpan.Zero).ToUnixTimeMilliseconds();
 
-		int numberOfPoints = DateTime.IsLeapYear(year.Value) ? 366 : 365;
+		int numberOfPoints = DateTime.IsLeapYear(Year.Value) ? 366 : 365;
 
 		GraphApiRequestBody graphApiRequestBody = new()
 		{
