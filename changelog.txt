@@ -1,0 +1,16 @@
+NN Toolkit
+================================================================================
+
+v1.2.0
+--------------------------------------------------------------------------------
+[bugfix] GetGraph was crushing when requested year returned no data.
+
+
+v1.1.0
+--------------------------------------------------------------------------------
+[new] Added support for calling NN API to retrieve chart information.
+
+
+v1.0.0
+--------------------------------------------------------------------------------
+[new] Support for parsing PDF files containing contributions statement for the Romanian Mandatory Private Pension.
