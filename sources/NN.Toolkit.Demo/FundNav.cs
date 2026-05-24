@@ -1,4 +1,4 @@
-namespace DustInTheWind.NN.Toolkit.Cli.Domain;
+namespace DustInTheWind.NN.Toolkit.Demo;
 
 /// <summary>
 /// Fund Net Asset Value

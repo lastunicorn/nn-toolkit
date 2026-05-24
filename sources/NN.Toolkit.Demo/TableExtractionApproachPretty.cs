@@ -1,6 +1,6 @@
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
-namespace DustInTheWind.NN.Toolkit.Cli;
+namespace DustInTheWind.NN.Toolkit.Demo;
 
 internal readonly record struct TableExtractionApproachPretty
 {
