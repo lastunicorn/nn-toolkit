@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  publish-nuget:
     runs-on: ubuntu-latest
 
     steps:
