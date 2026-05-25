@@ -1,3 +1,4 @@
+using System.Globalization;
 using DustInTheWind.NN.Toolkit.MandatoryPrivatePension.Pdf;
 
 namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
@@ -21,7 +22,7 @@ internal static class P2PdfTableRowExtensions
         }
     }
 
-    public static decimal GetDecimal(this P2PdfTableRow row, int index)
+    public static decimal GetDecimal(this P2PdfTableRow row, int index, CultureInfo cultureInfo)
     {
         if (index < 0 || index >= row.Count())
             throw new ArgumentOutOfRangeException(nameof(index));
@@ -30,7 +31,7 @@ internal static class P2PdfTableRowExtensions
 
         try
         {
-            return decimal.Parse(rawValue);
+            return decimal.Parse(rawValue, cultureInfo);
         }
         catch (Exception ex)
         {
