@@ -9,7 +9,7 @@ internal static class Program
 		// Uncomment the use case you want to run.
 
 		//await ParseContributionFile();
-		await DisplayPensionFundFromWeb();
+		//await DisplayPensionFundFromWeb();
 	}
 
 	private static Task ParseContributionFile()

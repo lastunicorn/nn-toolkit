@@ -25,6 +25,8 @@ internal class DisplayPensionFundFromWebUseCase
 
 		int numberOfPoints = toDate.DayNumber - fromDate.DayNumber + 1;
 
+		Console.WriteLine($"Reading fund NAV values from {fromDate} to {toDate} ({numberOfPoints} points)");
+
 		NnApiClient nnApiClient = new();
 		GraphData graphData = await nnApiClient.GetGraph(fromDate, toDate, numberOfPoints);
 
@@ -39,17 +41,26 @@ internal class DisplayPensionFundFromWebUseCase
 
 	private void DisplayFundRecords(IEnumerable<FundNav> fundRecords)
 	{
-		DataGrid dataGrid = new();
+		DataGrid dataGrid = new()
+		{
+			Margin = "0 1 0 1"
+		};
 
 		dataGrid.Columns.Add("Date", HorizontalAlignment.Center);
 		dataGrid.Columns.Add("Value", HorizontalAlignment.Right);
 
+		int count = 0;
+		
 		foreach (FundNav fundRecord in fundRecords)
 		{
 			dataGrid.Rows.Add(
 				fundRecord.Date,
 				fundRecord.Value);
+			
+			count++;
 		}
+		
+		dataGrid.Footer = $"Total records: {count}";
 
 		dataGrid.Display();
 	}

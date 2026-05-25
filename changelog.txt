@@ -3,7 +3,7 @@ NN Toolkit
 
 v1.2.0
 --------------------------------------------------------------------------------
-[bugfix] GetGraph was crushing when requested year returned no data.
+[bugfix] `GetGraph` method was crushing when requested year returned no data.
 
 
 v1.1.0
