@@ -1,6 +1,10 @@
 NN Toolkit
 ================================================================================
 
+v1.5.0
+--------------------------------------------------------------------------------
+[new] Added CultureInfo parameter to parsing contributions PDF file. Default value CultureInfo.InvariantCulture.
+
 v1.4.0
 --------------------------------------------------------------------------------
 [new] Added MonthDate.TryParse() method.
