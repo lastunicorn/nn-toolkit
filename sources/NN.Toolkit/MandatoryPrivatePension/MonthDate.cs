@@ -39,6 +39,33 @@ public readonly record struct MonthDate
 		};
 	}
 
+	public static bool TryParse(string text, out MonthDate monthDate)
+	{
+		monthDate = default;
+
+		if (text == null)
+			return false;
+
+		string[] parts = text.Split('/');
+
+		if (parts.Length != 2)
+			return false;
+
+		if (!int.TryParse(parts[0], out int month))
+			return false;
+
+		if (!int.TryParse(parts[1], out int year))
+			return false;
+
+		monthDate = new MonthDate
+		{
+			Month = month,
+			Year = year
+		};
+
+		return true;
+	}
+
 	public static implicit operator string(MonthDate monthDate)
 	{
 		return monthDate.ToString();
