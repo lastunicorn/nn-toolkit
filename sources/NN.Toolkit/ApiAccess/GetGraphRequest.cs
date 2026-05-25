@@ -18,20 +18,27 @@ internal class GetGraphRequest
 
 	public HttpRequestMessage ToHttpRequestMessage()
 	{
-		DateTimeOffset startOffset = new(StartDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
-		long startMilliseconds = startOffset.ToUnixTimeMilliseconds();
+		// NN API uses Unix time in milliseconds.
+		// Date range:
+		//		- Start date range is NOT inclusive. We subtract 1 day to make it inclusive.
+		//		- End date range is inclusive.
+		
+		DateTime startDateTime = StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)
+			.AddDays(-1);
+		DateTimeOffset startDateTimeOffset = new(startDateTime);
+		long startUnixMilliseconds = startDateTimeOffset.ToUnixTimeMilliseconds();
 
-		DateTimeOffset endOffset = new(EndDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
-		endOffset = endOffset.AddTicks(TimeSpan.TicksPerDay - TimeSpan.TicksPerMillisecond);
-		long endMilliseconds = endOffset.ToUnixTimeMilliseconds();
+		DateTime endDateTime = EndDate.ToDateTime(TimeOnly.MinValue);
+		DateTimeOffset endDateTimeOffset = new(endDateTime, TimeSpan.Zero);
+		long endUnixMilliseconds = endDateTimeOffset.ToUnixTimeMilliseconds();
 
 		GraphRequestBody graphRequestBody = new()
 		{
 			Bl = "2",
 			NumberOfPoints = Count,
 			Currency = "LEI",
-			DateRangeFrom = startMilliseconds,
-			DateRangeTo = endMilliseconds
+			DateRangeFrom = startUnixMilliseconds,
+			DateRangeTo = endUnixMilliseconds
 		};
 
 		string requestBody = JsonSerializer.Serialize(graphRequestBody, JsonSerializerOptions);
