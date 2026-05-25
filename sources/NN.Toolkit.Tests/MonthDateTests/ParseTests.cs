@@ -33,14 +33,14 @@ public class ParseTests
 	}
 
 	[Fact]
-	public void Parse_ThrowsIndexOutOfRangeException_WhenInputDoesNotContainSeparator()
+	public void Parse_ThrowsFormatException_WhenInputDoesNotMatchAnySupportedFormat()
 	{
-		Assert.Throws<IndexOutOfRangeException>(() => MonthDate.Parse("112025"));
+		Assert.Throws<FormatException>(() => MonthDate.Parse("112025"));
 	}
 
 	[Fact]
-	public void Parse_ThrowsNullReferenceException_WhenInputIsNull()
+	public void Parse_ThrowsArgumentNullException_WhenInputIsNull()
 	{
-		Assert.Throws<NullReferenceException>(() => MonthDate.Parse(null!));
+		Assert.Throws<ArgumentNullException>(() => MonthDate.Parse(null!));
 	}
 }
