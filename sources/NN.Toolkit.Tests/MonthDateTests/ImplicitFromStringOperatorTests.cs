@@ -12,4 +12,13 @@ public class ImplicitFromStringOperatorTests
 		Assert.Equal(2023, monthDate.Year);
 		Assert.Equal(9, monthDate.Month);
 	}
+
+	[Fact]
+	public void ImplicitMonthDateConversion_ThrowsFormatException_ForInvalidInput()
+	{
+		Assert.Throws<FormatException>(() =>
+		{
+			MonthDate _ = "invalid";
+		});
+	}
 }

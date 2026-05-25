@@ -4,6 +4,19 @@ namespace DustInTheWind.NN.Toolkit.Tests.MonthDateTests;
 
 public class ConstructorTests
 {
+	[Theory]
+	[InlineData(1, 1)]
+	[InlineData(1, 12)]
+	[InlineData(2024, 1)]
+	[InlineData(2024, 12)]
+	public void Constructor_SavesBoundaryValues_WhenInputIsValid(int year, int month)
+	{
+		MonthDate monthDate = new(year, month);
+
+		Assert.Equal(year, monthDate.Year);
+		Assert.Equal(month, monthDate.Month);
+	}
+
 	[Fact]
 	public void Constructor_SavesValues_WhenInputIsValid()
 	{

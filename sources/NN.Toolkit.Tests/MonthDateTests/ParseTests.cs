@@ -4,6 +4,17 @@ namespace DustInTheWind.NN.Toolkit.Tests.MonthDateTests;
 
 public class ParseTests
 {
+	[Theory]
+	[InlineData("01/0001", 1, 1)]
+	[InlineData("12/2025", 12, 2025)]
+	public void Parse_ExtractsMonthAndYear_ForBoundaryLikeValues(string text, int expectedMonth, int expectedYear)
+	{
+		MonthDate monthDate = MonthDate.Parse(text);
+
+		Assert.Equal(expectedYear, monthDate.Year);
+		Assert.Equal(expectedMonth, monthDate.Month);
+	}
+
 	[Fact]
 	public void Parse_ExtractsMonthAndYear()
 	{
@@ -11,5 +22,25 @@ public class ParseTests
 
 		Assert.Equal(2025, monthDate.Year);
 		Assert.Equal(11, monthDate.Month);
+	}
+
+	[Theory]
+	[InlineData("AA/2025")]
+	[InlineData("11/BBBB")]
+	public void Parse_ThrowsFormatException_WhenInputContainsNonNumericValues(string text)
+	{
+		Assert.Throws<FormatException>(() => MonthDate.Parse(text));
+	}
+
+	[Fact]
+	public void Parse_ThrowsIndexOutOfRangeException_WhenInputDoesNotContainSeparator()
+	{
+		Assert.Throws<IndexOutOfRangeException>(() => MonthDate.Parse("112025"));
+	}
+
+	[Fact]
+	public void Parse_ThrowsNullReferenceException_WhenInputIsNull()
+	{
+		Assert.Throws<NullReferenceException>(() => MonthDate.Parse(null!));
 	}
 }
