@@ -1,5 +1,7 @@
 # NN Toolkit
 
+[![GitHub Repo](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/lastunicorn/nn-toolkit) [![GitHub Build](https://img.shields.io/github/actions/workflow/status/lastunicorn/nn-toolkit/build-master.yml?logo=github)](https://github.com/lastunicorn/salt-bank-toolkit/actions/workflows/build-master.yml) [![NuGet Version](https://img.shields.io/nuget/v/DustInTheWind.NN.Toolkit?logo=nuget)](https://www.nuget.org/packages/DustInTheWind.NN.Toolkit) [![NuGet Downloads](https://img.shields.io/nuget/dt/DustInTheWind.NN.Toolkit?logo=nuget)](https://www.nuget.org/packages/DustInTheWind.NN.Toolkit)
+
 `NN Toolkit` is a .NET library for working with files exported from NN (Nationale-Nederlanden), currently focused on
 parsing PDF contribution statements for the Romanian Mandatory Private Pension (Pilon II).
 
