@@ -1,8 +1,0 @@
-<Solution>
-    <Folder Name="/SolutionItems/">
-        <File Path="Directory.Build.props" />
-    </Folder>
-    <Project Path="NN.Toolkit.Demo\NN.Toolkit.Demo.csproj" />
-    <Project Path="NN.Toolkit.Tests/NN.Toolkit.Tests.csproj" />
-    <Project Path="NN.Toolkit/NN.Toolkit.csproj" />
-</Solution>

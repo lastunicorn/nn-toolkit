@@ -18,7 +18,7 @@ internal class DisplayPensionFundFromWebUseCase
 
 	private async Task<GraphData> ReadFromNnApi()
 	{
-		const int year = 2007;
+		const int year = 2025;
 
 		DateOnly fromDate = new(year, 1, 1);
 		DateOnly toDate = new(year, 12, 31);

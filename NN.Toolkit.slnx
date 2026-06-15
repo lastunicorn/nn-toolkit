@@ -1,0 +1,5 @@
+<Solution>
+    <Project Path="sources/NN.Toolkit.Demo/NN.Toolkit.Demo.csproj" />
+    <Project Path="sources/NN.Toolkit.Tests/NN.Toolkit.Tests.csproj" />
+    <Project Path="sources/NN.Toolkit/NN.Toolkit.csproj" />
+</Solution>
