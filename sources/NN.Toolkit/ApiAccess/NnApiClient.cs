@@ -25,7 +25,7 @@ public sealed class NnApiClient : IDisposable, INnApiClient
 
 		using HttpRequestMessage httpRequestMessage = request.ToHttpRequestMessage();
 		HttpResponseMessage httpResponseMessage = await http.SendAsync(httpRequestMessage);
-		
+
 		httpResponseMessage.EnsureSuccessStatusCode();
 
 		GetGraphResponse response = new(httpResponseMessage);

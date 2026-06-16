@@ -4,5 +4,5 @@ public class GraphData
 {
 	public string Name { get; set; }
 
-	public List<NnGraphPoint> Points { get;} = [];
+	public List<NnGraphPoint> Points { get; } = [];
 }

@@ -30,4 +30,3 @@ public class TryParseTests
 		Assert.Equal(default, monthDate);
 	}
 }
-

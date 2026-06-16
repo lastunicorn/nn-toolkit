@@ -4,7 +4,7 @@ namespace DustInTheWind.NN.Toolkit.MandatoryPrivatePension;
 
 public class DocumentLoadResult
 {
-    public ContributionsDocument Document { get; set; }
+	public ContributionsDocument Document { get; set; }
 
-    public DocumentParsingDiagnostics Diagnostics { get; set; }
+	public DocumentParsingDiagnostics Diagnostics { get; set; }
 }

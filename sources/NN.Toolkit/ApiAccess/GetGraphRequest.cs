@@ -22,7 +22,7 @@ internal class GetGraphRequest
 		// Date range:
 		//		- Start date range is NOT inclusive. We subtract 1 day to make it inclusive.
 		//		- End date range is inclusive.
-		
+
 		DateTime startDateTime = StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)
 			.AddDays(-1);
 		DateTimeOffset startDateTimeOffset = new(startDateTime);
