@@ -1,17 +1,25 @@
 NN Toolkit
 ================================================================================
 
+v1.6.0
+--------------------------------------------------------------------------------
+[new   ] Generate and publish a symbol package (.snupkg).
+
+
 v1.5.0
 --------------------------------------------------------------------------------
 [new] Added CultureInfo parameter to parsing contributions PDF file. Default value CultureInfo.InvariantCulture.
+
 
 v1.4.0
 --------------------------------------------------------------------------------
 [new] Added MonthDate.TryParse() method.
 
+
 v1.3.0
 --------------------------------------------------------------------------------
 [bugfix] Fixed date interval calculation for GetGraph. Made StartDate inclusive date.
+
 
 v1.2.0
 --------------------------------------------------------------------------------
